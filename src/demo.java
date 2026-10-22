@@ -16,7 +16,9 @@ public class demo
 
         Trial trial = new Trial(1000);
         System.out.printf("The average load across all cores is %.2f%%%n", trial.getCpuLoad());
-        System.out.printf("Core 1: %.2f%%, Core 2: %.2f%%, Core 3: %.2f%%, Core 4: %.2f%%%n", trial.getCoreLoad(0), trial.getCoreLoad(1), trial.getCoreLoad(2), trial.getCoreLoad(3));
+        for(int i = 0; i < cpuInfo.getCount(); i++){
+            System.out.printf("The load across core %d is %.2f%%%n", i, trial.getCoreLoad(i));
+        }
         
         System.out.println("memory: total=" + memInfo.getTotal() + " KiB, used=" + memInfo.getUsed() + " KiB");
 
