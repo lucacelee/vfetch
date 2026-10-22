@@ -11,9 +11,13 @@ public class demo
 {
     public static void main(String[] args) throws Exception
     {
-        System.out.println("cores:  " + cpuInfo.getCount());
         System.out.println("model:  " + cpuInfo.getModel());
-        System.out.println("core 0: busy=" + cpuInfo.getBusy(0) + " idle=" + cpuInfo.getIdle(0));
+        System.out.println("cores:  " + cpuInfo.getCount());
+
+        Trial trial = new Trial(1000);
+        System.out.printf("The average load across all cores is %.2f%%%n", trial.getCpuLoad());
+        System.out.printf("Core 1: %.2f%%, Core 2: %.2f%%, Core 3: %.2f%%, Core 4: %.2f%%%n", trial.getCoreLoad(0), trial.getCoreLoad(1), trial.getCoreLoad(2), trial.getCoreLoad(3));
+        
         System.out.println("memory: total=" + memInfo.getTotal() + " KiB, used=" + memInfo.getUsed() + " KiB");
 
         idLookup pci = idLookup.pci();

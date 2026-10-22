@@ -8,19 +8,6 @@ public class Trial{
     private long totalBusyDiff = 0;
     private long totalIdleDiff = 0;
 
-    public static void main(String[] args) throws Exception{
-
-        //display no. of cores and CPU model using mark's methods.
-        System.out.println(cpuInfo.getCount());
-        System.out.println(cpuInfo.getModel());
-
-        // Create a new trial 
-        Trial myTrial = new Trial(1000);
-
-        System.out.printf("The average load across all cores is %.2f%%%n", myTrial.getCpuLoad());
-        System.out.printf("Core 1: %.2f%%, Core 2: %.2f%%, Core 3: %.2f%%, Core 4: %.2f%%%n", myTrial.getCoreLoad(0), myTrial.getCoreLoad(1), myTrial.getCoreLoad(2), myTrial.getCoreLoad(3));
-    }
-
     Trial (int milliseconds) { // The trial is inside of the constructor, so that it doesn't have to be rerun every time you want to access each core individually
 
         /* mark's methods here get the busy and idle time of the
