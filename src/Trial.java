@@ -1,10 +1,10 @@
 public class Trial{
 
     private int cores = cpuInfo.getCount();
-    private long[] busy1 = new long[cores];
-    private long[] idle1 = new long[cores];
-    private long[] busy2 = new long[cores];
-    private long[] idle2 = new long[cores];
+    private long[] busyStarts = new long[cores];
+    private long[] idleStarts = new long[cores];
+    private long[] busyFinishes = new long[cores];
+    private long[] idleFinishes = new long[cores];
     private long totalBusyDiff = 0;
     private long totalIdleDiff = 0;
 
@@ -33,8 +33,8 @@ public class Trial{
         the end */
 
         for(int i = 0; i < cores; i++){
-            busy1[i] = cpuInfo.getBusy(i);
-            idle1[i] = cpuInfo.getIdle(i);
+            busyStarts[i] = cpuInfo.getBusy(i);
+            idleStarts[i] = cpuInfo.getIdle(i);
         }
 
         try {
@@ -44,11 +44,11 @@ public class Trial{
         }
 
         for(int i = 0; i < cores; i++){
-            busy2[i] = cpuInfo.getBusy(i);
-            idle2[i] = cpuInfo.getIdle(i);
+            busyFinishes[i] = cpuInfo.getBusy(i);
+            idleFinishes[i] = cpuInfo.getIdle(i);
 
-            long busyDiff = busy2[i] - busy1[i];
-            long idleDiff = idle2[i] - idle1[i];
+            long busyDiff = busyFinishes[i] - busyStarts[i];
+            long idleDiff = idleFinishes[i] - idleStarts[i];
 
             totalBusyDiff += busyDiff;
             totalIdleDiff += idleDiff;
@@ -65,8 +65,8 @@ public class Trial{
         if (core < 0 || core >= cores) {
             return -1.0;
         }
-        long busyDiff = busy2[core] - busy1[core];
-        long idleDiff = idle2[core] - idle1[core];
+        long busyDiff = busyFinishes[core] - busyStarts[core];
+        long idleDiff = idleFinishes[core] - idleStarts[core];
         long totalDiff = busyDiff + idleDiff;
         double averageLoad = ((double) busyDiff / totalDiff) * 100;
         return averageLoad;
