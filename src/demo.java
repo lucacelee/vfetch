@@ -33,7 +33,7 @@ public class demo
 
         
         System.out.println("memory: total=" + memInfo.getTotal() + " KiB, used=" + memInfo.getUsed() + " KiB");
-        long percentInUse = (memInfo.getUsed() / memInfo.getTotal()) * 100;
+        double percentInUse = (memInfo.getUsed() / memInfo.getTotal()) * 100;
         System.out.println("Percentage in use: " + percentInUse + "%");
         System.out.println();
 
