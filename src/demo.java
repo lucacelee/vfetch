@@ -19,8 +19,16 @@ public class demo
         for(int i = 0; i < cpuInfo.getCount(); i++){
             System.out.printf("The load across core %d is %.2f%%%n", i, trial.getCoreLoad(i));
         }
-        
-        System.out.println("memory: total=" + memInfo.getTotal() + " KiB, used=" + memInfo.getUsed() + " KiB");
+        System.out.println();
+        System.out.println("------RAM INFORMATION------");
+        if (memInfo.getTotal() == -1 || memInfo.getUsed() == -1) {
+            System.out.println("ERROR: Unable to read RAM information from your machine");
+        } else {
+            System.out.printf("Your machine currently has %.2f GiB of RAM in total%n", memInfo.getTotal());
+            System.out.printf("Your are now currently using %.2f GiB of RAM%n", memInfo.getUsed()); 
+        }
+        memInfo.displayPercentage();
+        System.out.println();
 
         idLookup pci = idLookup.pci();
         System.out.println("PCI devices: " + pciInfo.getCount());
