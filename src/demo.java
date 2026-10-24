@@ -17,26 +17,30 @@ public class demo
 
         //Requirement 1: Processor
 
+        System.out.println();
         System.out.println("model:  " + cpuInfo.getModel());
         System.out.println("cores:  " + cpuInfo.getCount());
+        System.out.println();
 
         Trial trial = new Trial(1000);
         System.out.printf("The average load across all cores is %.2f%%%n", trial.getCpuLoad());
         for(int i = 0; i < cpuInfo.getCount(); i++){
             System.out.printf("The load across core %d is %.2f%%%n", i, trial.getCoreLoad(i));
         }
+        System.out.println();
 
         //Requirement 2: Memory
 
         
         System.out.println("memory: total=" + memInfo.getTotal() + " KiB, used=" + memInfo.getUsed() + " KiB");
-        long percentInUse = (memInfo.getTotal() / memInfo.getUsed()) * 100;
-        System.out.println("Percentage in use: " + percentInUse);
+        long percentInUse = (memInfo.getUsed() / memInfo.getTotal()) * 100;
+        System.out.println("Percentage in use: " + percentInUse + "%");
+        System.out.println();
 
         //Requirement 3 + 6: Pci devices and analysis
 
         List<PciDevice> pciDevices = PciDevice.mapDevices();
-        System.out.printf("PCI DEVICES LIST (Total: %d devices%n)", pciInfo.getCount());
+        System.out.printf("PCI DEVICES LIST (Total: %d devices)%n", pciInfo.getCount());
 
         //PCI devices, sorted by numerical address order bus, device, function
 
@@ -44,10 +48,10 @@ public class demo
         System.out.println("----SORTED NUMERICALLY BY ADDRESS - BUS, DEVICE, FUNCTION-----");
         System.out.printf("%-20s %-35s%n", "Device Address", "Device Name");
         System.out.println("-------------------------------------------------------------");
-        System.out.println();
         for(PciDevice dev : pciDevices){
             System.out.printf("%-20s %-35s%n", dev.getAddress(), dev.getDeviceName());
         }
+        System.out.println();
 
         //PCI devices sorted in alphabetical order in reference to vendor name
         PciDevice.sortByVendorName(pciDevices);
@@ -58,9 +62,11 @@ public class demo
             System.out.printf("%-35s %-20s%n", dev.getVendorName(), dev.getAddress());
         }
 
+        System.out.println();
         //Summary: I chose the example one of listing the number of devices per vendor
         System.out.println("----SUMMARY OF NUMBER OF DEVICES PER VENDOR----\n");
         PciDevice.devicesPerVendor(pciDevices);
+        System.out.println();
         //I kept the print statement for this one in the PciDevices class file because it was 
         //so much easier because all the variables were local to that class
 
