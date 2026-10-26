@@ -187,16 +187,16 @@ public class vfetch {
 
     public static void println(String output) {
         if (!printToConsole) return;
-        println(output);
+        System.out.println(output);
     }
 
     public static void println() {
         if (!printToConsole) return;
-        println();
+        System.out.println();
     }
 
     public static void printf(String formatString, Object... arguments) {
         if (!printToConsole) return;
-        printf(formatString, arguments);
+       System.out.printf(formatString, arguments);
     }
 }
