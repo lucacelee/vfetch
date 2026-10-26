@@ -11,11 +11,15 @@ import java.util.List;
  * Build:  javac *.java
  * Run:    java demo        (run it from the folder that contains the ids folder)
  */
-public class demo
-{
-    public static void main(String[] args) throws Exception
-    {
-
+public class demo {
+    private static boolean writeToFile = false;
+    private static boolean printToConsole = true;
+    private static boolean printHelpMessage = false;
+    public static void main(String[] args) throws Exception {
+        if (args.length > 0) {          // This helps determine whether we want to print out a file or not
+            processArguments(args);
+        }
+        
         //Requirement 1: Processor
 
         System.out.println();
@@ -98,6 +102,43 @@ public class demo
             System.out.printf("  Bus %03d Device %03d: ID %04x:%04x  %s %s%n", usbInfo.getBusNumber(i),
                               usbInfo.getDeviceNumber(i), vendor, product,
                               usb.vendorName(vendor), usb.deviceName(vendor, product));
+        }
+    }
+
+    private static void processArguments(String[] args) {
+        for (int a = 0; a < args.length; a++) {
+            if (args[a].startsWith("-")) {
+                if (!args[a+1].startsWith("-")) {
+                    String argument = args[a].substring(1);
+                    char[] parameters = argument.toCharArray();
+                    for (char p : parameters) {
+                        switch (p) {
+                            case 'o':
+                                writeToFile = true;
+                                break;
+                            case 's':
+                                printToConsole = false;
+                                break;
+                            case 'h':
+                                printHelpMessage = true;
+                                break;
+                        }
+                    }
+                } else {
+                    String flag = args[a].substring(2);
+                    switch (flag) {
+                        case "output":
+                            writeToFile = true;
+                            break;
+                        case "silence":
+                            printToConsole = false;
+                            break;
+                        case "help":
+                            printHelpMessage = true;
+                            break;
+                    }
+                }
+            }
         }
     }
 }
