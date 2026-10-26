@@ -18,13 +18,13 @@ public class demo
         //Requirement 1: Processor
 
         System.out.println();
-        System.out.println("model:  " + cpuInfo.getModel());
-        System.out.println("cores:  " + cpuInfo.getCount());
+        System.out.println("model:  " + CpuInfo.getModel());
+        System.out.println("cores:  " + CpuInfo.getCount());
         System.out.println();
 
         Trial trial = new Trial(1000);
         System.out.printf("The average load across all cores is %.2f%%%n", trial.getCpuLoad());
-        for(int i = 0; i < cpuInfo.getCount(); i++){
+        for(int i = 0; i < CpuInfo.getCount(); i++){
             System.out.printf("The load across core %d is %.2f%%%n", i, trial.getCoreLoad(i));
         }
 

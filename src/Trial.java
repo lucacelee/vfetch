@@ -1,6 +1,6 @@
 public class Trial{
 
-    private int cores = cpuInfo.getCount();
+    private int cores = CpuInfo.getCount();
     private long[] busyStarts = new long[cores];
     private long[] idleStarts = new long[cores];
     private long[] busyFinishes = new long[cores];
@@ -20,8 +20,8 @@ public class Trial{
         the end */
 
         for(int i = 0; i < cores; i++){
-            busyStarts[i] = cpuInfo.getBusy(i);
-            idleStarts[i] = cpuInfo.getIdle(i);
+            busyStarts[i] = CpuInfo.getBusy(i);
+            idleStarts[i] = CpuInfo.getIdle(i);
         }
 
         try {
@@ -31,8 +31,8 @@ public class Trial{
         }
 
         for(int i = 0; i < cores; i++){
-            busyFinishes[i] = cpuInfo.getBusy(i);
-            idleFinishes[i] = cpuInfo.getIdle(i);
+            busyFinishes[i] = CpuInfo.getBusy(i);
+            idleFinishes[i] = CpuInfo.getIdle(i);
 
             long busyDiff = busyFinishes[i] - busyStarts[i];
             long idleDiff = idleFinishes[i] - idleStarts[i];
