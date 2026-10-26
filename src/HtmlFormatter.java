@@ -13,6 +13,56 @@ public class HtmlFormatter {
     private String html = """
             <!DOCTYPE html>
             <html>
+                <style>
+                    table {
+                        border-collapse: collapse;
+                        border: 2px solid rgb(140 140 140);
+                        font-family: sans-serif;
+                        font-size: 0.8rem;
+                        letter-spacing: 1px;
+                    }
+
+                    caption {
+                        caption-side: bottom;
+                        padding: 10px;
+                        font-weight: bold;
+                    }
+
+                    thead,
+                    tfoot {
+                        background-color: rgb(228 240 245);
+                    }
+
+                    th,
+                    td {
+                        border: 1px solid rgb(160 160 160);
+                        padding: 8px 10px;
+                    }
+
+                    td:last-of-type {
+                        text-align: center;
+                    }
+
+                    tbody > tr:nth-of-type(even) {
+                        background-color: rgb(237 238 242);
+                    }
+
+                    tfoot th {
+                        text-align: right;
+                    }
+
+                    tfoot td {
+                        font-weight: bold;
+                    }
+
+                    body {
+                        font-family: sans-serif;
+                    }
+
+                    .clickable {
+                        cursor: pointer;
+                    }
+                </style>
                 <head>
                     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
                     <title>!title;</title>
@@ -108,7 +158,7 @@ public class HtmlFormatter {
     }
 
     public void formatHTML() {
-        html = html.replaceAll("$title;", heading);
+        html = html.replaceAll("!title;", heading);
         String body = "";
 
         // Populating the HTML with data
@@ -194,6 +244,7 @@ public class HtmlFormatter {
                 ram.totalPercentage()*100
             );
         body += "        <h2>PCI Device Information</h2>\n";
+        body += "        <p>You can sort the columns by clicking on the labels.</p>\n";
         body += busDeviceTable(pciDevices);
         // We will need another one for USB devices
         html = html.replaceAll("!body;", body);
@@ -210,38 +261,38 @@ public class HtmlFormatter {
                             </caption>
                             <thead>
                                 <tr>
-                                    <th scope="col", onclick="sortTable(0, '%s', false)">
+                                    <th scope="col", onclick="sortTable(0, '%s', false)", class="clickable">
                                         Bus
                                     </th>
-                                    <th scope="col", onclick="sortTable(1, '%s', false)">
+                                    <th scope="col", onclick="sortTable(1, '%s', false)", class="clickable">
                                         Device
                                     </th>
                 """, busType, (busType == "pci") ? "PCI" : "USB", busType, busType);
         if (busType == "pci") {
             table += """
-                                        <th scope="col", onclick="sortTable(2, 'pci', false)">
+                                        <th scope="col", onclick="sortTable(2, 'pci', false)", class="clickable">
                                             Function
                                         </th>
-                                        <th scope="col", onclick="sortTable(3, 'pci', true)">
+                                        <th scope="col", onclick="sortTable(3, 'pci', true)", class="clickable">
                                             Address
                                         </th>
                     """;
         }
         int sub = (busType == "pci") ? 0 : 2;
         table += String.format("""
-                                    <th scope="col", onclick="sortTable(%d, '%s', false)">
+                                    <th scope="col", onclick="sortTable(%d, '%s', false)", class="clickable">
                                         ID
                                     </th>
-                                    <th scope="col", onclick="sortTable(%d, '%s', false)">
+                                    <th scope="col", onclick="sortTable(%d, '%s', false)", class="clickable">
                                         Class Code
                                     </th>
-                                    <th scope="col", onclick="sortTable(%d, '%s', true)">
+                                    <th scope="col", onclick="sortTable(%d, '%s', true)", class="clickable">
                                         Class
                                     </th>
-                                    <th scope="col", onclick="sortTable(%d, '%s', true)">
+                                    <th scope="col", onclick="sortTable(%d, '%s', true)", class="clickable">
                                         Vendor Name
                                     </th>
-                                    <th scope="col", onclick="sortTable(%d, '%s', true)">
+                                    <th scope="col", onclick="sortTable(%d, '%s', true)", class="clickable">
                                         Device Name
                                     </th>
                                 </tr>
