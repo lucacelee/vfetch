@@ -1,4 +1,5 @@
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,8 +25,12 @@ public class demo
 
         Trial trial = new Trial(1000);
         System.out.printf("The average load across all cores is %.2f%%%n", trial.getCpuLoad());
+
+        List<Core> cores = new ArrayList<Core>();       // This unifies the code between the CLI and HTML formatter
         for(int i = 0; i < CpuInfo.getCount(); i++){
-            System.out.printf("The load across core %d is %.2f%%%n", i, trial.getCoreLoad(i));
+            Core c = new Core(i, trial.getCoreLoad(i));
+            System.out.println(c.toString());
+            cores.add(c);
         }
 
         //Requirement 2: Memory
