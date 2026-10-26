@@ -65,20 +65,20 @@ public class memInfo
         if (total > 0) {
             double usedPercent = (double) used / total * 100;
             double unusedPercent = 100 - usedPercent;
-            System.out.printf("Your current RAM usage is: %.2f%%%n", usedPercent);
-            System.out.printf("You currently have %.2f%% of RAM free %n", unusedPercent);
+            vfetch.printf("Your current RAM usage is: %.2f%%%n", usedPercent);
+            vfetch.printf("You currently have %.2f%% of RAM free %n", unusedPercent);
             if (usedPercent >= 95) {
-                System.out.println("WARNING: You are using an extremely high amount of RAM, consider upgrading or closing applications");
+                vfetch.println("WARNING: You are using an extremely high amount of RAM, consider upgrading or closing applications");
             } else  if (usedPercent >= 85) {
-                System.out.println("You are using a high amount of RAM, this may cause some performance issues");
+                vfetch.println("You are using a high amount of RAM, this may cause some performance issues");
             } else if (usedPercent >= 60) {
-                System.out.println("You are using a moderate amount of RAM");
+                vfetch.println("You are using a moderate amount of RAM");
             } else {
-                System.out.println("You have plenty of RAM available");
+                vfetch.println("You have plenty of RAM available");
             }
 
         } else {
-            System.out.println("Error: Unable to read RAM information");
+            vfetch.println("Error: Unable to read RAM information");
         }
     }
 }

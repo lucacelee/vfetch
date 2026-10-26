@@ -3,19 +3,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class PciDevice{
-
-    //Declare attributes
-    private int bus;
-    private int device;
-    private int function;
-    private int vendorId;
-    private int deviceId;
-    private int classCode;
-    private String vendorName;
-    private String deviceName;
-    private String className;
-    private String address;
+public class PciDevice extends BusDevice{
     static int count = pciInfo.getCount();
 
     //Constructor for each device
@@ -30,44 +18,8 @@ public class PciDevice{
             this.deviceName = deviceName;
             this.className = className;
             this.address = address;
+            this.typeOfBus = "pci";
     }
-
-    //Getters for address and numerical IDs - these methods come from pciInfo.java
-
-    public String getAddress() {
-         return address; 
-    }
-    public int getBus() { 
-        return bus; 
-    }
-    public int getDevice() {
-         return device; 
-    }
-    public int getFunction() {
-         return function; 
-    }
-    public int getVendorId() {
-         return vendorId; 
-    }
-    public int getDeviceId() {
-         return deviceId; 
-    }
-    public int getClassCode() {
-         return classCode; 
-    }
-
-    //Getters for names, these come from idLookup.java.
-
-    public String getVendorName() {
-         return vendorName; 
-    }
-    public String getDeviceName() {
-         return deviceName; 
-    }
-    public String getClassName() {
-         return className; 
-    }
-    
 
     /* creating a method that takes each of the pci devices read by Linux, and
     turns them into objects of the PciDevice class and stores them in
@@ -137,11 +89,11 @@ public class PciDevice{
             }
         }
 
-    System.out.println("\n--- PCI Summary: Devices Per Vendor ---");
+    vfetch.println("\n--- PCI Summary: Devices Per Vendor ---");
     for (int i = 0; i < vendorNames.size(); i++) {
         String name = vendorNames.get(i);
         int count = vendorCount.get(i);
-        System.out.printf("  %-35s : %d devices%n", name, count);
+        vfetch.printf("  %-35s : %d devices%n", name, count);
     }
 
 }
