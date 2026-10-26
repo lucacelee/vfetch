@@ -21,7 +21,7 @@ public class HtmlFormatter {
                     !body;
                     <!-- Script gracefully taken from https://www.w3schools.com/howto/howto_js_sort_table.asp -->
                     <script>
-                        function sortTable(n, tableId) {
+                        function sortTable(n, tableId, alphabetical) {
                             var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
                             table = document.getElementById(tableId);
                             switching = true;
@@ -44,18 +44,32 @@ public class HtmlFormatter {
                                     y = rows[i + 1].getElementsByTagName("TD")[n];
                                     /* Check if the two rows should switch place,
                                     based on the direction, asc or desc: */
-                                    if (dir == "asc") {
-                                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-                                        // If so, mark as a switch and break the loop:
-                                        shouldSwitch = true;
-                                        break;
+                                    if (alphabetical) {
+                                        if (dir == "asc") {
+                                            if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                                            // If so, mark as a switch and break the loop:
+                                            shouldSwitch = true;
+                                            break;
+                                            }
+                                        } else if (dir == "desc") {
+                                            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                                            // If so, mark as a switch and break the loop:
+                                            shouldSwitch = true;
+                                            break;
+                                            }
                                         }
-                                    } else if (dir == "desc") {
-                                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-                                        // If so, mark as a switch and break the loop:
-                                        shouldSwitch = true;
-                                        break;
-                                        }
+                                    } else {
+                                        if (dir == "asc") {
+                                            if (Number(x.innerHTML) > Number(y.innerHTML)) {
+                                                shouldSwitch = true;
+                                                break;
+                                            }
+                                        } else if (dir == "desc") {
+                                            if (Number(x.innerHTML) < Number(y.innerHTML)) {
+                                                shouldSwitch = true;
+                                                break;
+                                            }
+                                        }    
                                     }
                                 }
                                 if (shouldSwitch) {
@@ -196,38 +210,38 @@ public class HtmlFormatter {
                             </caption>
                             <thead>
                                 <tr>
-                                    <th scope="col", onclick="sortTable(0, '%s')">
+                                    <th scope="col", onclick="sortTable(0, '%s', false)">
                                         Bus
                                     </th>
-                                    <th scope="col", onclick="sortTable(1, '%s')">
+                                    <th scope="col", onclick="sortTable(1, '%s', false)">
                                         Device
                                     </th>
                 """, busType, (busType == "pci") ? "PCI" : "USB", busType, busType);
         if (busType == "pci") {
             table += """
-                                        <th scope="col", onclick="sortTable(2, 'pci')">
+                                        <th scope="col", onclick="sortTable(2, 'pci', false)">
                                             Function
                                         </th>
-                                        <th scope="col", onclick="sortTable(3, 'pci')">
+                                        <th scope="col", onclick="sortTable(3, 'pci', true)">
                                             Address
                                         </th>
                     """;
         }
         int sub = (busType == "pci") ? 0 : 2;
         table += String.format("""
-                                    <th scope="col", onclick="sortTable(%d, '%s')">
+                                    <th scope="col", onclick="sortTable(%d, '%s', false)">
                                         ID
                                     </th>
-                                    <th scope="col", onclick="sortTable(%d, '%s')">
+                                    <th scope="col", onclick="sortTable(%d, '%s', false)">
                                         Class Code
                                     </th>
-                                    <th scope="col", onclick="sortTable(%d, '%s')">
+                                    <th scope="col", onclick="sortTable(%d, '%s', true)">
                                         Class
                                     </th>
-                                    <th scope="col", onclick="sortTable(%d, '%s')">
+                                    <th scope="col", onclick="sortTable(%d, '%s', true)">
                                         Vendor Name
                                     </th>
-                                    <th scope="col", onclick="sortTable(%d, '%s')">
+                                    <th scope="col", onclick="sortTable(%d, '%s', true)">
                                         Device Name
                                     </th>
                                 </tr>
