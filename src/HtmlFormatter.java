@@ -2,8 +2,8 @@ import java.util.List;
 
 public class HtmlFormatter {
     private final String heading;
-    private final List<BusDevice> pciDevices;
-    // private final List<BusDevice> usbDevices; // Will hopefully exist when we merge Helena's PR
+    private final List<PciDevice> pciDevices;
+    // private final List<UsbDevice> usbDevices; // Will hopefully exist when we merge Helena's PR
     private final List<Core> cores;
     private final double cpuLoad;
     private final Ram ram;
@@ -11,77 +11,76 @@ public class HtmlFormatter {
     private boolean formatted = false;
 
     private String html = """
-            <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-            "http://www.w3.org/TR/html4/loose.dtd">
+            <!DOCTYPE html>
             <html>
                 <head>
                     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-                    <title>$title;</title>
+                    <title>!title;</title>
                 </head>
                 <body>
-                    $body;
+                    !body;
+                    <!-- Script gracefully taken from https://www.w3schools.com/howto/howto_js_sort_table.asp -->
+                    <script>
+                        function sortTable(n, tableId) {
+                            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+                            table = document.getElementById(tableId);
+                            switching = true;
+                            // Set the sorting direction to ascending:
+                            dir = "asc";
+                            /* Make a loop that will continue until
+                            no switching has been done: */
+                            while (switching) {
+                                // Start by saying: no switching is done:
+                                switching = false;
+                                rows = table.rows;
+                                /* Loop through all table rows (except the
+                                first, which contains table headers): */
+                                for (i = 1; i < (rows.length - 1); i++) {
+                                    // Start by saying there should be no switching:
+                                    shouldSwitch = false;
+                                    /* Get the two elements you want to compare,
+                                    one from current row and one from the next: */
+                                    x = rows[i].getElementsByTagName("TD")[n];
+                                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                                    /* Check if the two rows should switch place,
+                                    based on the direction, asc or desc: */
+                                    if (dir == "asc") {
+                                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                                        // If so, mark as a switch and break the loop:
+                                        shouldSwitch = true;
+                                        break;
+                                        }
+                                    } else if (dir == "desc") {
+                                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                                        // If so, mark as a switch and break the loop:
+                                        shouldSwitch = true;
+                                        break;
+                                        }
+                                    }
+                                }
+                                if (shouldSwitch) {
+                                    /* If a switch has been marked, make the switch
+                                    and mark that a switch has been done: */
+                                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                                    switching = true;
+                                    // Each time a switch is done, increase this count by 1:
+                                    switchcount ++;
+                                } else {
+                                    /* If no switching has been done AND the direction is "asc",
+                                    set the direction to "desc" and run the while loop again. */
+                                    if (switchcount == 0 && dir == "asc") {
+                                        dir = "desc";
+                                        switching = true;
+                                    }
+                                }
+                            }
+                        }
+                    </script>
                 </body>
             </html>
-            <!-- Script gracefully taken from https://www.w3schools.com/howto/howto_js_sort_table.asp -->
-            <script>
-                function sortTable(n, tableId) {
-                var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-                table = document.getElementById(tableId);
-                switching = true;
-                // Set the sorting direction to ascending:
-                dir = "asc";
-                /* Make a loop that will continue until
-                no switching has been done: */
-                while (switching) {
-                    // Start by saying: no switching is done:
-                    switching = false;
-                    rows = table.rows;
-                    /* Loop through all table rows (except the
-                    first, which contains table headers): */
-                    for (i = 1; i < (rows.length - 1); i++) {
-                    // Start by saying there should be no switching:
-                    shouldSwitch = false;
-                    /* Get the two elements you want to compare,
-                    one from current row and one from the next: */
-                    x = rows[i].getElementsByTagName("TD")[n];
-                    y = rows[i + 1].getElementsByTagName("TD")[n];
-                    /* Check if the two rows should switch place,
-                    based on the direction, asc or desc: */
-                    if (dir == "asc") {
-                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-                        // If so, mark as a switch and break the loop:
-                        shouldSwitch = true;
-                        break;
-                        }
-                    } else if (dir == "desc") {
-                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-                        // If so, mark as a switch and break the loop:
-                        shouldSwitch = true;
-                        break;
-                        }
-                    }
-                    }
-                    if (shouldSwitch) {
-                    /* If a switch has been marked, make the switch
-                    and mark that a switch has been done: */
-                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                    switching = true;
-                    // Each time a switch is done, increase this count by 1:
-                    switchcount ++;
-                    } else {
-                    /* If no switching has been done AND the direction is "asc",
-                    set the direction to "desc" and run the while loop again. */
-                    if (switchcount == 0 && dir == "asc") {
-                        dir = "desc";
-                        switching = true;
-                    }
-                    }
-                }
-                }
-                </script>
             """;
 
-    public HtmlFormatter(String heading, List<BusDevice> pciDevices, double cpuLoad, List<Core> cores, Ram ram) {
+    public HtmlFormatter(String heading, List<PciDevice> pciDevices, double cpuLoad, List<Core> cores, Ram ram) {
         this.heading = heading;
         this.pciDevices = pciDevices;
         this.cpuLoad = cpuLoad;
@@ -95,11 +94,11 @@ public class HtmlFormatter {
     }
 
     public void formatHTML() {
-        html.replace("$title;", heading);
+        html = html.replaceAll("$title;", heading);
         String body = "";
 
         // Populating the HTML with data
-        body += "        <h1>" + heading + "</h1>";
+        body += "<h1>" + heading + "</h1>\n";
         body += """
                         <h2>CPU Information</h2>
                         <table>
@@ -120,21 +119,21 @@ public class HtmlFormatter {
                 """;
         for (Core c : cores) {
             body += String.format("""
-                            <tr>
-                                <td>%d</td>
-                                <td>%.2f%%</td>
-                            <tr>
+                                    <tr>
+                                        <td>%d</td>
+                                        <td>%.2f%%</td>
+                                    <tr>
                     """, c.core(), c.load());
         }
         body += String.format("""
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th scope="row" colspan="1">Total load</th>
-                                <td>%.2f%%</td>
-                            </tr>
-                        </tfoot>
-                    </table>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th scope="row" colspan="1">Total load</th>
+                                    <td>%.2f%%</td>
+                                </tr>
+                            </tfoot>
+                        </table>
                 """, cpuLoad);
         body += String.format("""
                         <h2>RAM Information</h2>
@@ -172,16 +171,22 @@ public class HtmlFormatter {
                                 </tr>
                             </tbody>
                         </table>
-                """, ram.used(), ram.free(), ram.total(), ram.usedPercentage(), ram.freePercentage(),
-                ram.totalPercentage());
-        body += "        <h2>PCI Device Information</h2>";
+                """, 
+                ram.used(),
+                ram.free(),
+                ram.total(),
+                ram.usedPercentage()*100,
+                ram.freePercentage()*100,
+                ram.totalPercentage()*100
+            );
+        body += "        <h2>PCI Device Information</h2>\n";
         body += busDeviceTable(pciDevices);
         // We will need another one for USB devices
-        html.replace("$body;", body);
+        html = html.replaceAll("!body;", body);
         formatted = true;
     }
 
-    private String busDeviceTable(List<BusDevice> devices) {
+    private String busDeviceTable(List<? extends BusDevice> devices) {
         String busType = devices.get(0).busType().toLowerCase();
         String table = "";
         table += String.format("""
@@ -191,38 +196,38 @@ public class HtmlFormatter {
                             </caption>
                             <thead>
                                 <tr>
-                                    <th scope="col", onclick="sortTable(0, "%s")">
+                                    <th scope="col", onclick="sortTable(0, '%s')">
                                         Bus
                                     </th>
-                                    <th scope="col", onclick="sortTable(1, "%s")">
+                                    <th scope="col", onclick="sortTable(1, '%s')">
                                         Device
                                     </th>
                 """, busType, (busType == "pci") ? "PCI" : "USB", busType, busType);
         if (busType == "pci") {
             table += """
-                                <th scope="col", onclick="sortTable(2, "pci")">
-                                    Function
-                                </th>
-                                <th scope="col", onclick="sortTable(3, "pci")">
-                                    Address
-                                </th>
+                                        <th scope="col", onclick="sortTable(2, 'pci')">
+                                            Function
+                                        </th>
+                                        <th scope="col", onclick="sortTable(3, 'pci')">
+                                            Address
+                                        </th>
                     """;
         }
         int sub = (busType == "pci") ? 0 : 2;
         table += String.format("""
-                                    <th scope="col", onclick="sortTable(%d, "%s")">
+                                    <th scope="col", onclick="sortTable(%d, '%s')">
                                         ID
                                     </th>
-                                    <th scope="col", onclick="sortTable(%d, "%s")">
+                                    <th scope="col", onclick="sortTable(%d, '%s')">
                                         Class Code
                                     </th>
-                                    <th scope="col", onclick="sortTable(%d, "%s")">
+                                    <th scope="col", onclick="sortTable(%d, '%s')">
                                         Class
                                     </th>
-                                    <th scope="col", onclick="sortTable(%d, "%s")">
+                                    <th scope="col", onclick="sortTable(%d, '%s')">
                                         Vendor Name
                                     </th>
-                                    <th scope="col", onclick="sortTable(%d, "%s")">
+                                    <th scope="col", onclick="sortTable(%d, '%s')">
                                         Device Name
                                     </th>
                                 </tr>
@@ -230,7 +235,7 @@ public class HtmlFormatter {
                             <tbody>
                 """, 4 - sub, busType, 5 - sub, busType, 6 - sub, busType, 7 - sub, busType, 8 - sub, busType);
         for (BusDevice d : devices) {
-            table += "            <tr>";
+            table += "            <tr>\n";
             table += String.format("""
                                     <td>
                                         %d
@@ -266,7 +271,7 @@ public class HtmlFormatter {
                                         %s
                                     </td>
                     """, d.getDeviceId(), d.getClassCode(), d.getClassName(), d.getVendorName(), d.getDeviceName());
-            table += "            </tr>";
+            table += "            </tr>\n";
         }
         table += """
                             </tbody>
