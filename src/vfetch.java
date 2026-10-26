@@ -178,7 +178,7 @@ public class vfetch {
                 Usage: vfetch [options] [output_file_name]
                     options:
                         -h --help       Print this message
-                        -s --seilent    Execute without printing anything
+                        -s --silent     Execute without printing anything
                         -o --output     Create a HTML document, where
                                         [output_file_name] is its name.
                                         By default it's "Hardware Details.html".
