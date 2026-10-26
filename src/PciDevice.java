@@ -89,11 +89,11 @@ public class PciDevice extends BusDevice{
             }
         }
 
-    System.out.println("\n--- PCI Summary: Devices Per Vendor ---");
+    vfetch.println("\n--- PCI Summary: Devices Per Vendor ---");
     for (int i = 0; i < vendorNames.size(); i++) {
         String name = vendorNames.get(i);
         int count = vendorCount.get(i);
-        System.out.printf("  %-35s : %d devices%n", name, count);
+        vfetch.printf("  %-35s : %d devices%n", name, count);
     }
 
 }
