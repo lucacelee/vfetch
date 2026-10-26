@@ -21,6 +21,11 @@ public class vfetch {
         if (args.length > 0) {          // This helps determine whether we want to print out a file or not
             processArguments(args);
         }
+
+        if (printHelpMessage) {
+            printHelp();
+            return;
+        }
         
         //Requirement 1: Processor
 
@@ -165,6 +170,19 @@ public class vfetch {
                 } 
             }
         }
+    }
+
+    private static void printHelp() {
+        System.out.println("""
+                vfetch - a program that gives you your system hardware details
+                Usage: vfetch [options] [output_file_name]
+                    options:
+                        -h --help       Print this message
+                        -s --seilent    Execute without printing anything
+                        -o --output     Create a HTML document, where
+                                        [output_file_name] is its name.
+                                        By default it's "Hardware Details.html".
+                """);
     }
 
     public static void println(String output) {
