@@ -15,6 +15,8 @@ public class demo {
     private static boolean writeToFile = false;
     private static boolean printToConsole = true;
     private static boolean printHelpMessage = false;
+
+    private static String fileName = "Hardware Details.html";
     public static void main(String[] args) throws Exception {
         if (args.length > 0) {          // This helps determine whether we want to print out a file or not
             processArguments(args);
@@ -103,24 +105,40 @@ public class demo {
                               usbInfo.getDeviceNumber(i), vendor, product,
                               usb.vendorName(vendor), usb.deviceName(vendor, product));
         }
+        
+        if (writeToFile) {
+            HtmlFormatter formatter = new HtmlFormatter(
+                "System Information Breakdown",
+                pciDevices,
+                trial.getCpuLoad(),
+                cores,
+                new Ram(memInfo.getTotal(), memInfo.getUsed(), memInfo.getAvailable())
+            );
+            formatter.formatHTML();
+            DocumentWriter.write(fileName, formatter.htmlDocument());
+        }
     }
 
     private static void processArguments(String[] args) {
+        String previousCommand = "";
         for (int a = 0; a < args.length; a++) {
             if (args[a].startsWith("-")) {
-                if (!args[a+1].startsWith("-")) {
+                if (!args[a].startsWith("--")) {
                     String argument = args[a].substring(1);
                     char[] parameters = argument.toCharArray();
                     for (char p : parameters) {
                         switch (p) {
                             case 'o':
                                 writeToFile = true;
+                                previousCommand = "output";
                                 break;
                             case 's':
                                 printToConsole = false;
+                                previousCommand = "silence";
                                 break;
                             case 'h':
                                 printHelpMessage = true;
+                                previousCommand = "help";
                                 break;
                         }
                     }
@@ -129,15 +147,22 @@ public class demo {
                     switch (flag) {
                         case "output":
                             writeToFile = true;
+                            previousCommand = "output";
                             break;
                         case "silence":
                             printToConsole = false;
+                            previousCommand = "silence";
                             break;
                         case "help":
                             printHelpMessage = true;
+                            previousCommand = "help";
                             break;
                     }
                 }
+            } else {
+                if (writeToFile && previousCommand == "output") {
+                    fileName = args[a];
+                } 
             }
         }
     }
