@@ -1,6 +1,4 @@
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 
 public class USBDevice extends BusDevice
 {
@@ -17,7 +15,7 @@ public class USBDevice extends BusDevice
                               usbInfo.getDeviceNumber(i), vendor, product,
                               usb.vendorName(vendor), usb.deviceName(vendor, product));
 
-            ArrayList<String> device = new ArrayList();
+            ArrayList<String> device = new ArrayList<>();
             device.add(String.valueOf(usbInfo.getBusNumber(i)));
             device.add(String.valueOf(usbInfo.getDeviceNumber(i)));
             device.add(String.valueOf(vendor));
@@ -28,14 +26,12 @@ public class USBDevice extends BusDevice
         }
     }
 
-    private int productID;
-
     public USBDevice(int bus, int device, int vendorID, int productID)
     {
         this.bus = bus;
         this.device = device;
         this.vendorId = vendorID;
-        this.productID = productID;
+        this.deviceId = productID;
     }
     
     public static ArrayList<USBDevice> mapUSBDevices() throws Exception
