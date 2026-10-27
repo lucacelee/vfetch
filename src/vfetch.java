@@ -110,18 +110,6 @@ public class vfetch {
                               usbInfo.getDeviceNumber(i), vendor, product,
                               usb.vendorName(vendor), usb.deviceName(vendor, product));
         }
-        
-        if (writeToFile) {
-            HtmlFormatter formatter = new HtmlFormatter(
-                "System Information Breakdown",
-                pciDevices,
-                trial.getCpuLoad(),
-                cores,
-                new Ram(memInfo.getTotal(), memInfo.getUsed(), memInfo.getAvailable())
-            );
-            formatter.formatHTML();
-            DocumentWriter.write(fileName, formatter.htmlDocument());
-        }
         println();
 
         //Requirement 5: Load and parellelism
@@ -155,7 +143,17 @@ public class vfetch {
         }
         printf("  Average Load across all cores: %.2f%%%n", liveTrial.getCpuLoad());
         
-    
+        if (writeToFile) {
+            HtmlFormatter formatter = new HtmlFormatter(
+                "System Information Breakdown",
+                pciDevices,
+                trial.getCpuLoad(),
+                cores,
+                new Ram(memInfo.getTotal(), memInfo.getUsed(), memInfo.getAvailable())
+            );
+            formatter.formatHTML();
+            DocumentWriter.write(fileName, formatter.htmlDocument());
+        }
     }
 
     private static void processArguments(String[] args) {
