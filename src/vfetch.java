@@ -122,9 +122,10 @@ public class vfetch {
             formatter.formatHTML();
             DocumentWriter.write(fileName, formatter.htmlDocument());
         }
+        println();
 
         //Requirement 5: Load and parellelism
-        System.out.println("/n-------------LOAD AND PARALLELISM--------------");
+        System.out.println("-------------LOAD AND PARALLELISM--------------");
         Parallelism parallelism = new Parallelism();
         double baselineTime = parallelism.runMatrixMultiplication(1000, 1);
         double parallelTime = parallelism.runMatrixMultiplication(1000, 4);
