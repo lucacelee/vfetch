@@ -124,8 +124,38 @@ public class vfetch {
         }
 
         //Requirement 5: Load and parellelism
+        System.out.println("/n-------------LOAD AND PARALLELISM--------------");
+        Parallelism parallelism = new Parallelism();
+        double baselineTime = parallelism.runMatrixMultiplication(1000, 1);
+        double parallelTime = parallelism.runMatrixMultiplication(1000, 4);
+        double f = parallelism.calculateF(baselineTime, parallelTime, 4);
 
+        int coresAvailable = CpuInfo.getCount();
+        System.out.println("Number of cores available: " + coresAvailable);
 
+        int[] threadCounts = {1, 2, 4, coresAvailable};
+         System.out.printf("%-25s | %-20s | %-20s | %-20s", "Number of threads", "Execution Time(s)", "Measured Speedup", "Amdahl's Limit%n");
+        
+        for (int thread : threadCounts){
+
+        double duration = parallelism.runMatrixMultiplication(1000, thread);
+            if(thread == 1){
+                baselineTime = duration;
+            }
+          
+            double speedup = baselineTime / duration;
+            double amdahlSpeedup = Parallelism.calculateAmdahlsSpeedup(thread, f);
+            System.out.printf("%-25d | %-20.4f | %-20.4f | %-20.4f%n", thread, duration, speedup, amdahlSpeedup);
+        }
+
+        System.out.println("\n--- Sampling Core Load using Trial.java ---");
+        Trial liveTrial = new Trial(1000); // Sample over 1000ms
+        for (int i = 0; i < coresAvailable; i++) {
+            System.out.printf("  Core %d Load: %.2f%%%n", i, liveTrial.getCoreLoad(i));
+        }
+        System.out.printf("  Average Load across all cores: %.2f%%%n", liveTrial.getCpuLoad());
+        
+    
     }
 
     private static void processArguments(String[] args) {

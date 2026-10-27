@@ -59,28 +59,21 @@ public class Parallelism{
         }
 
         long endTime = System.nanoTime();
-        return (endTime - startTime) / 1000000000; //returns time in seconds.
+        return (endTime - startTime) / 1000000000.0; //returns time in seconds.
     }
 
     //creating a method that calculates f; the fraction of the workload that is serial, 
-    //based on the baseline time and the time it takes to run the workload with 4 threads.
+    //based on the baseline time and the time it takes to run the workload with n threads.
     //f = (baselineTime - parallelTime) / baselineTime;
 
-    double baselineTime = runMatrixMultiplication(1000, 1); //run the workload with 1 thread to get the baseline time
-    double parallelTime = runMatrixMultiplication(1000, 4); //run the workload with 4 threads to get the speedup time
-    public double calculateF(){
+    public static double calculateF(double baselineTime, double parallelTime, int numThreads) {
         double speedup = baselineTime / parallelTime;
-        double f = ((4 - speedup) / (3 * speedup)); //f = (n - speedup) / ((n - 1) * speedup) when you manipulate amdahls law formula.
+        double f = (numThreads - speedup) / ((numThreads - 1) * speedup);
         return f;
     }
 
     public static double calculateAmdahlsSpeedup(int n, double f){
         return (double) n / (1 + ((n - 1) * f));
-    }
-    public static void main (String[] args){
-        Parallelism parallelism = new Parallelism();
-        double f = parallelism.calculateF();
-        System.out.println("The fraction of the workload that is serial is: " + f);
     }
 
 }
