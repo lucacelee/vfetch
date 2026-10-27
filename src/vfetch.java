@@ -100,15 +100,25 @@ public class vfetch {
         // }
 
         //Requirement 4: USB devices
+        ArrayList<ArrayList<String>> USBDevices = new ArrayList<>();
 
         idLookup usb = idLookup.usb();
-        println("USB devices: " + usbInfo.getCount());
+        System.out.println("USB devices: " + usbInfo.getCount());                     
         for (int i = 0; i < usbInfo.getCount(); i++) {
             int vendor = usbInfo.getVendorId(i);
             int product = usbInfo.getProductId(i);
-            printf("  Bus %03d Device %03d: ID %04x:%04x  %s %s%n", usbInfo.getBusNumber(i),
+            System.out.printf("  Bus %03d Device %03d: ID %04x:%04x  %s %s%n", usbInfo.getBusNumber(i),
                               usbInfo.getDeviceNumber(i), vendor, product,
                               usb.vendorName(vendor), usb.deviceName(vendor, product));
+            ArrayList<String> device = new ArrayList();
+            device.add(String.valueOf(usbInfo.getBusNumber(i)));
+            device.add(String.valueOf(usbInfo.getDeviceNumber(i)));
+            device.add(String.valueOf(vendor));
+            device.add(String.valueOf(product));
+
+            //2D arraylist containing the usb data
+            USBDevices.add(device);
+
         }
         println();
 
@@ -143,6 +153,8 @@ public class vfetch {
         }
         printf("  Average Load across all cores: %.2f%%%n", liveTrial.getCpuLoad());
         
+
+
         if (writeToFile) {
             HtmlFormatter formatter = new HtmlFormatter(
                 "System Information Breakdown",
