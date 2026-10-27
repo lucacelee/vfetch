@@ -9,7 +9,7 @@ import java.util.List;
  * the results.
  *
  * Build:  javac *.java
- * Run:    java demo        (run it from the folder that contains the ids folder)
+ * Run:    java vfetch       (run it from the folder that contains the ids folder)
  */
 public class vfetch {
     private static boolean writeToFile = false;
@@ -122,6 +122,10 @@ public class vfetch {
             formatter.formatHTML();
             DocumentWriter.write(fileName, formatter.htmlDocument());
         }
+
+        //Requirement 5: Load and parellelism
+
+
     }
 
     private static void processArguments(String[] args) {
