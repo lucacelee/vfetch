@@ -103,11 +103,11 @@ public class vfetch {
         ArrayList<ArrayList<String>> USBDevices = new ArrayList<>();
 
         idLookup usb = idLookup.usb();
-        System.out.println("USB devices: " + usbInfo.getCount());                     
+        vfetch.println("USB devices: " + usbInfo.getCount());                     
         for (int i = 0; i < usbInfo.getCount(); i++) {
             int vendor = usbInfo.getVendorId(i);
             int product = usbInfo.getProductId(i);
-            System.out.printf("  Bus %03d Device %03d: ID %04x:%04x  %s %s%n", usbInfo.getBusNumber(i),
+            vfetch.printf("  Bus %03d Device %03d: ID %04x:%04x  %s %s%n", usbInfo.getBusNumber(i),
                               usbInfo.getDeviceNumber(i), vendor, product,
                               usb.vendorName(vendor), usb.deviceName(vendor, product));
 
@@ -134,6 +134,7 @@ public class vfetch {
             formatter.formatHTML();
             DocumentWriter.write(fileName, formatter.htmlDocument());
         }
+    }
     }
 
     private static void processArguments(String[] args) {
