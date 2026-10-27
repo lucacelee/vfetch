@@ -125,16 +125,16 @@ public class vfetch {
         println();
 
         //Requirement 5: Load and parellelism
-        System.out.println("-------------LOAD AND PARALLELISM--------------");
+        println("-------------LOAD AND PARALLELISM--------------");
         double baselineTime = Parallelism.runMatrixMultiplication(1000, 1);
         double parallelTime = Parallelism.runMatrixMultiplication(1000, 4);
         double f = Parallelism.calculateF(baselineTime, parallelTime, 4);
 
         int coresAvailable = CpuInfo.getCount();
-        System.out.println("Number of cores available: " + coresAvailable);
+        println("Number of cores available: " + coresAvailable);
 
         int[] threadCounts = {1, 2, 4, coresAvailable};
-         System.out.printf("%-25s | %-20s | %-20s | %-20s%n", "Number of threads", "Execution Time(s)", "Measured Speedup", "Amdahl's Limit");
+         printf("%-25s | %-20s | %-20s | %-20s%n", "Number of threads", "Execution Time(s)", "Measured Speedup", "Amdahl's Limit");
         
         for (int thread : threadCounts){
 
@@ -145,15 +145,15 @@ public class vfetch {
           
             double speedup = baselineTime / duration;
             double amdahlSpeedup = Parallelism.calculateAmdahlsSpeedup(thread, f);
-            System.out.printf("%-25d | %-20.4f | %-20.4f | %-20.4f%n", thread, duration, speedup, amdahlSpeedup);
+            printf("%-25d | %-20.4f | %-20.4f | %-20.4f%n", thread, duration, speedup, amdahlSpeedup);
         }
 
-        System.out.println("\n--- Sampling Core Load using Trial.java ---");
+        println("\n--- Sampling Core Load using Trial.java ---");
         Trial liveTrial = new Trial(1000); // Sample over 1000ms
         for (int i = 0; i < coresAvailable; i++) {
-            System.out.printf("  Core %d Load: %.2f%%%n", i, liveTrial.getCoreLoad(i));
+            printf("  Core %d Load: %.2f%%%n", i, liveTrial.getCoreLoad(i));
         }
-        System.out.printf("  Average Load across all cores: %.2f%%%n", liveTrial.getCpuLoad());
+        printf("  Average Load across all cores: %.2f%%%n", liveTrial.getCpuLoad());
         
     
     }
