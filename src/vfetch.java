@@ -126,10 +126,9 @@ public class vfetch {
 
         //Requirement 5: Load and parellelism
         System.out.println("-------------LOAD AND PARALLELISM--------------");
-        Parallelism parallelism = new Parallelism();
-        double baselineTime = parallelism.runMatrixMultiplication(1000, 1);
-        double parallelTime = parallelism.runMatrixMultiplication(1000, 4);
-        double f = parallelism.calculateF(baselineTime, parallelTime, 4);
+        double baselineTime = Parallelism.runMatrixMultiplication(1000, 1);
+        double parallelTime = Parallelism.runMatrixMultiplication(1000, 4);
+        double f = Parallelism.calculateF(baselineTime, parallelTime, 4);
 
         int coresAvailable = CpuInfo.getCount();
         System.out.println("Number of cores available: " + coresAvailable);
@@ -139,7 +138,7 @@ public class vfetch {
         
         for (int thread : threadCounts){
 
-        double duration = parallelism.runMatrixMultiplication(1000, thread);
+        double duration = Parallelism.runMatrixMultiplication(1000, thread);
             if(thread == 1){
                 baselineTime = duration;
             }
