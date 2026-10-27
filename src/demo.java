@@ -7,6 +7,9 @@
  * Build:  javac *.java
  * Run:    java demo        (run it from the folder that contains the ids folder)
  */
+
+import java.util.ArrayList;
+
 public class demo
 {
     public static void main(String[] args) throws Exception
@@ -25,6 +28,8 @@ public class demo
                               pci.vendorName(vendor), pci.deviceName(vendor, device));
         }
 
+        ArrayList<ArrayList<String>> USBDevices = new ArrayList<>();
+             
         idLookup usb = idLookup.usb();
         System.out.println("USB devices: " + usbInfo.getCount());
         for (int i = 0; i < usbInfo.getCount(); i++) {
@@ -33,6 +38,16 @@ public class demo
             System.out.printf("  Bus %03d Device %03d: ID %04x:%04x  %s %s%n", usbInfo.getBusNumber(i),
                               usbInfo.getDeviceNumber(i), vendor, product,
                               usb.vendorName(vendor), usb.deviceName(vendor, product));
+
+            ArrayList<String> device = new ArrayList();
+            device.add(String.valueOf(usbInfo.getBusNumber(i)));
+            device.add(String.valueOf(usbInfo.getDeviceNumber(i)));
+            device.add(String.valueOf(vendor));
+            device.add(String.valueOf(product));
+
+            //2D arraylist containing the usb data
+            USBDevices.add(device);
         }
     }
 }
+
