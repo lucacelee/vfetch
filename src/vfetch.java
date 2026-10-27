@@ -134,7 +134,7 @@ public class vfetch {
         System.out.println("Number of cores available: " + coresAvailable);
 
         int[] threadCounts = {1, 2, 4, coresAvailable};
-         System.out.printf("%-25s | %-20s | %-20s | %-20s", "Number of threads", "Execution Time(s)", "Measured Speedup", "Amdahl's Limit%n");
+         System.out.printf("%-25s | %-20s | %-20s | %-20s%n", "Number of threads", "Execution Time(s)", "Measured Speedup", "Amdahl's Limit");
         
         for (int thread : threadCounts){
 
