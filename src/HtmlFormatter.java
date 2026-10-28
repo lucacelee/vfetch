@@ -3,7 +3,7 @@ import java.util.List;
 public class HtmlFormatter {
     private final String heading;
     private final List<PciDevice> pciDevices;
-    // private final List<UsbDevice> usbDevices; // Will hopefully exist when we merge Helena's PR
+    private final List<USBDevice> usbDevices;
     private final List<Core> cores;
     private final double cpuLoad;
     private final Ram ram;
@@ -144,9 +144,10 @@ public class HtmlFormatter {
             </html>
             """;
 
-    public HtmlFormatter(String heading, List<PciDevice> pciDevices, double cpuLoad, List<Core> cores, Ram ram) {
+    public HtmlFormatter(String heading, List<PciDevice> pciDevices, List<USBDevice> usbDevices, double cpuLoad, List<Core> cores, Ram ram) {
         this.heading = heading;
         this.pciDevices = pciDevices;
+        this.usbDevices = usbDevices;
         this.cpuLoad = cpuLoad;
         this.cores = cores;
         this.ram = ram;
