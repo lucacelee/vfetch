@@ -12,6 +12,18 @@ public class HtmlFormatter {
     private boolean printingParallelism = true;
     private boolean formatted = false;
 
+    /*  
+        The following string is simply a template for the page.
+        It mostly consists of embedded CSS (to make it pretty),
+        but also a small JavaScript script for table sorting.
+        The actual HTML body is left blank, except for a
+        replacement string `!body;`, that then gets swapped
+        for the real contents of the document.
+
+        The data is formatted and accessed using different
+        methods.
+    */
+
     private String html = """
             <!DOCTYPE html>
             <html>
@@ -156,22 +168,49 @@ public class HtmlFormatter {
         this.pResultRecord = parallelismRecord;
     }
 
+    // This is to access the document
     public String htmlDocument() {
         if (!formatted) return "";
         return html;
     }
 
+    // This is to format the document
     public void formatHTML() {
         html = html.replaceAll("!title;", heading);
         String body = "";
 
         // Populating the HTML with data
+
+        /*
+            Here, the data gets wrapped in HTML to format it in
+            a specific way. Various HTML tags are stored as
+            templates in format strings. The data is inserted
+            using `String.format()`, the same way you do `printf`,
+            and then get appended onto the end of `body`, which
+            starts off blank.
+
+            Most of this is just tables, and in HTML tables
+            are defined line by line. You go "start row", then
+            put a value for each column, and then end the row.
+            
+            I am using multiline strings
+            (noted by using three quotation marks), to save on
+            operations. And so, inside of those, format tags
+            (so your %d, %n and %f) get turned into real values.
+            At the end, `body` replaces "!body;" in the template.
+        */
+
+        // Step 1: The heading
         body += "    <h1>" + heading + "</h1>\n";
+
+        // Step 2: CPU Information
         body += "        <h2>CPU Information</h2>";
         body += coresTable(this.cores, this.cpuLoad);
         body += "            <h3>Load and Parallelism</h3>\n";
         body += loadAndParallelismTable();
         body += coresTable(pResultRecord.coreLoads(), pResultRecord.cpuLoad());
+
+        // Step 3: RAM Information
         body += String.format("""
                         <h2>RAM Information</h2>
                         <table>
@@ -216,19 +255,26 @@ public class HtmlFormatter {
                 ram.freePercentage()*100,
                 ram.totalPercentage()*100
             );
+
+        // Step 4: PCI Device Information
         body += "        <h2>PCI Device Information</h2>\n";
         body += "        <p>You can sort the columns by clicking on the labels.</p>\n";
         body += busDeviceTable(pciDevices);
+
+        // Step 5: USB Device Information
         body += "        <h2>USB Device Information</h2>\n";
         body += "        <p>You can sort the columns by clicking on the labels.</p>\n";
         body += busDeviceTable(usbDevices);
-        // We will need another one for USB devices
+
+        // Step 6: Fill in the data into the template
         html = html.replaceAll("!body;", body);
         formatted = true;
     }
 
     private String coresTable(List<Core> cores, double cpuLoad) {
         String body = "";
+
+        // This is the beginning of the table declaration. It also has some headers
         body += """
                         <table>
                             <caption>
@@ -246,6 +292,17 @@ public class HtmlFormatter {
                             </thead>
                             <tbody>
                 """;
+
+        /* 
+            For each core, it creates 2 columns in a row:
+                                        +------+------+
+                                        | Core | Load |
+                                        +------+------+
+                                        |  %d  |%.2f%%|
+                                            ... etc.
+            and fills them with the data using `String.format()`
+                                        
+        */
         for (Core c : cores) {
             body += String.format("""
                                     <tr>
@@ -254,6 +311,8 @@ public class HtmlFormatter {
                                     <tr>
                     """, c.core(), c.load());
         }
+
+        // This is the footer of the table with total CPU and the closure of the table
         body += String.format("""
                             </tbody>
                             <tfoot>
@@ -270,6 +329,8 @@ public class HtmlFormatter {
     private String busDeviceTable(List<? extends BusDevice> devices) {
         String busType = devices.get(0).busType().toLowerCase();
         String table = "";
+
+        // New table declaration
         table += String.format("""
                         <table id="%s">
                             <caption>
@@ -284,6 +345,8 @@ public class HtmlFormatter {
                                         Device
                                     </th>
                 """, busType, (busType == "pci") ? "PCI" : "USB", busType, busType);
+        
+        // PCI devices have extra fields that can be filled, so for them we add 2 extra columns
         if (busType == "pci") {
             table += """
                                         <th scope="col", onclick="sortTable(2, 'pci', false)", class="clickable">
@@ -314,7 +377,15 @@ public class HtmlFormatter {
                                 </tr>
                             </thead>
                             <tbody>
-                """, 4 - sub, busType, 5 - sub, busType, 6 - sub, busType, (busType == "pci") ? "Class" : "Device Type" , 7 - sub, busType, 8 - sub, busType);
+                """, 
+                4 - sub, busType,
+                5 - sub, busType,
+                6 - sub, busType,
+                (busType == "pci") ? "Class" : "Device Type" ,
+                7 - sub, busType,
+                8 - sub, busType);
+
+        // For each device, it fills in a table row and adds it to the main text body string
         for (BusDevice d : devices) {
             table += "            <tr>\n";
             table += String.format("""
@@ -354,6 +425,8 @@ public class HtmlFormatter {
                     """, d.getDeviceId(), d.getClassCode(), d.getClassName(), d.getVendorName(), d.getDeviceName());
             table += "            </tr>\n";
         }
+
+        // End of table declaration
         table += """
                             </tbody>
                         </table>
@@ -361,6 +434,7 @@ public class HtmlFormatter {
         return table;
     }
 
+    // Generates the table for the parallelism test
     private String loadAndParallelismTable() {
         if (!printingParallelism) return "";
         String table = "";
