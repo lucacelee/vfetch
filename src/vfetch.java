@@ -1,5 +1,5 @@
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -100,26 +100,8 @@ public class vfetch {
         // }
 
         //Requirement 4: USB devices
-        ArrayList<ArrayList<String>> USBDevices = new ArrayList<>();
-
-        idLookup usb = idLookup.usb();
-        vfetch.println("USB devices: " + usbInfo.getCount());                     
-        for (int i = 0; i < usbInfo.getCount(); i++) {
-            int vendor = usbInfo.getVendorId(i);
-            int product = usbInfo.getProductId(i);
-            vfetch.printf("  Bus %03d Device %03d: ID %04x:%04x  %s %s%n", usbInfo.getBusNumber(i),
-                              usbInfo.getDeviceNumber(i), vendor, product,
-                              usb.vendorName(vendor), usb.deviceName(vendor, product));
-            ArrayList<String> device = new ArrayList();
-            device.add(String.valueOf(usbInfo.getBusNumber(i)));
-            device.add(String.valueOf(usbInfo.getDeviceNumber(i)));
-            device.add(String.valueOf(vendor));
-            device.add(String.valueOf(product));
-
-            //2D arraylist containing the usb data
-            USBDevices.add(device);
-
-        }
+        printf("USB DEVICES LIST (Total: %d devices)%n", usbInfo.getCount());
+        ArrayList<USBDevice> usbDevices = USBDevice.mapDevices();
         println();
 
         //Requirement 5: Load and parellelism
@@ -128,15 +110,19 @@ public class vfetch {
         double parallelTime = Parallelism.runMatrixMultiplication(1000, 4);
         double f = Parallelism.calculateF(baselineTime, parallelTime, 4);
 
+        HashMap<Integer, Double> timeTestResults = new HashMap<Integer, Double>();
+        HashMap<Integer, Double> speedupResults = new HashMap<Integer, Double>();
+        HashMap<Integer, Double> amdahlSpeedups = new HashMap<Integer, Double>();
+
         int coresAvailable = CpuInfo.getCount();
         println("Number of cores available: " + coresAvailable);
 
         int[] threadCounts = {1, 2, 4, coresAvailable};
-         printf("%-25s | %-20s | %-20s | %-20s%n", "Number of threads", "Execution Time(s)", "Measured Speedup", "Amdahl's Limit");
+        printf("%-25s | %-20s | %-20s | %-20s%n", "Number of threads", "Execution Time(s)", "Measured Speedup", "Amdahl's Limit");
         
         for (int thread : threadCounts){
 
-        double duration = Parallelism.runMatrixMultiplication(1000, thread);
+            double duration = Parallelism.runMatrixMultiplication(1000, thread);
             if(thread == 1){
                 baselineTime = duration;
             }
@@ -144,29 +130,44 @@ public class vfetch {
             double speedup = baselineTime / duration;
             double amdahlSpeedup = Parallelism.calculateAmdahlsSpeedup(thread, f);
             printf("%-25d | %-20.4f | %-20.4f | %-20.4f%n", thread, duration, speedup, amdahlSpeedup);
+
+            timeTestResults.put(thread, duration);
+            speedupResults.put(thread, speedup);
+            amdahlSpeedups.put(thread, amdahlSpeedup);
         }
 
         println("\n--- Sampling Core Load using Trial.java ---");
         Trial liveTrial = new Trial(1000); // Sample over 1000ms
+        ArrayList<Core> coreLoads = new ArrayList<Core>();
         for (int i = 0; i < coresAvailable; i++) {
             printf("  Core %d Load: %.2f%%%n", i, liveTrial.getCoreLoad(i));
+            coreLoads.add(new Core(i, liveTrial.getCoreLoad(i)));
         }
         printf("  Average Load across all cores: %.2f%%%n", liveTrial.getCpuLoad());
         
-
+        ParallelismRecord parrallelismTest = new ParallelismRecord(
+            baselineTime,
+            coresAvailable,
+            timeTestResults,
+            speedupResults,
+            amdahlSpeedups,
+            coreLoads,
+            liveTrial.getCpuLoad()
+        );
 
         if (writeToFile) {
             HtmlFormatter formatter = new HtmlFormatter(
                 "System Information Breakdown",
                 pciDevices,
+                usbDevices,
                 trial.getCpuLoad(),
                 cores,
-                new Ram(memInfo.getTotal(), memInfo.getUsed(), memInfo.getAvailable())
+                new Ram(memInfo.getTotal(), memInfo.getUsed(), memInfo.getAvailable()),
+                parrallelismTest
             );
             formatter.formatHTML();
             DocumentWriter.write(fileName, formatter.htmlDocument());
         }
-    }
     }
 
     private static void processArguments(String[] args) {
