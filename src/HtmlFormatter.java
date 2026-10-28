@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class HtmlFormatter {
@@ -8,6 +9,8 @@ public class HtmlFormatter {
     private final double cpuLoad;
     private final Ram ram;
     private final ParallelismRecord pResultRecord;
+    private final ArrayList<ArrayList<AccessTime>> accessTimeMatrix;
+    private final ArrayList<Cache> caches;
 
     private boolean printingParallelism = true;
     private boolean formatted = false;
@@ -158,7 +161,7 @@ public class HtmlFormatter {
             </html>
             """;
 
-    public HtmlFormatter(String heading, List<PciDevice> pciDevices, List<USBDevice> usbDevices, double cpuLoad, List<Core> cores, Ram ram, ParallelismRecord parallelismRecord) {
+    public HtmlFormatter(String heading, List<PciDevice> pciDevices, List<USBDevice> usbDevices, double cpuLoad, List<Core> cores, Ram ram, ParallelismRecord parallelismRecord, ArrayList<ArrayList<AccessTime>> accessTimeMatrix, ArrayList<Cache> caches) {
         this.heading = heading;
         this.pciDevices = pciDevices;
         this.usbDevices = usbDevices;
@@ -166,6 +169,8 @@ public class HtmlFormatter {
         this.cores = cores;
         this.ram = ram;
         this.pResultRecord = parallelismRecord;
+        this.accessTimeMatrix = accessTimeMatrix;
+        this.caches = caches;
     }
 
     // This is to access the document

@@ -164,7 +164,9 @@ public class vfetch {
                 trial.getCpuLoad(),
                 cores,
                 new Ram(memInfo.getTotal(), memInfo.getUsed(), memInfo.getAvailable()),
-                parrallelismTest
+                parrallelismTest,
+                MemHierarchy.getAccessTimeMatrix(),
+                MemHierarchy.getCaches()
             );
             formatter.formatHTML();
             DocumentWriter.write(fileName, formatter.htmlDocument());
