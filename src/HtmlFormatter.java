@@ -558,4 +558,55 @@ public class HtmlFormatter {
                 """;
         return table;
     }
+
+    private String cacheTable() {
+        String table = "";
+        table += """
+                <table id="parallelism">
+                    <caption>
+                        Caches present on this machine
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th scope="col", onclick="sortTable(0, 'parallelism', false)", class="clickable">
+                                Cache Level
+                            </th>
+                            <th scope="col", onclick="sortTable(1, 'parallelism', false)", class="clickable">
+                                Cache Type
+                            </th>
+                            <th scope="col", onclick="sortTable(2, 'parallelism', false)", class="clickable">
+                                Cache Size
+                            </th>
+                            <th scope="col", onclick="sortTable(3, 'parallelism', false)", class="clickable">
+                                Line Size
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                """;
+        for (Cache c : caches) {
+
+            table += "            <tr>\n";
+            table += String.format("""
+                                    <td>
+                                        L%s
+                                    </td>
+                                    <td>
+                                        %s
+                                    </td>
+                                    <td>
+                                        %s
+                                    </td>
+                                    <td>
+                                        %s Bytes
+                                    </td>
+                    """, c.level(), c.type(), c.size(), c.lineSize());
+            table += "            </tr>\n";
+        }
+        table += """
+                            </tbody>
+                        </table>
+                """;
+        return table;
+    }
 }
