@@ -34,13 +34,11 @@ public class MemHierarchy {
 
             for (int stride = 1; stride <= 128; stride *= 2){
                  //strides choose how many integers are skipped during the adding process
-                long sum = 0;
                 long accesses = 0;
                 long startTime = System.nanoTime();
 
                 for (int trial = 0; trial < trialSize; trial++) {
                     for (int i = 0; i < workingSet; i+= stride) {
-                        sum += estimating[i];
                         accesses++;
                     }
                     //adds all of the random numbers and records the time it takes to do so
