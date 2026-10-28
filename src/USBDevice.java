@@ -57,8 +57,8 @@ public class USBDevice extends BusDevice
             int deviceID = usbInfo.getProductId(i);
             int classCode = usbInfo.getClassCode(i);
             String vendorName = usb.vendorName(vendorID);
-            String deviceName = usb.deviceName(vendorID, deviceID);
-            String className = usb.className(classCode);
+            String deviceName = usbInfo.getProduct(i);
+            String className = usb.deviceName(vendorID, deviceID);
 
             list.add(new USBDevice(bus, device, function, vendorID, deviceID, classCode, vendorName, deviceName, className));
 

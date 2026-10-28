@@ -291,7 +291,7 @@ public class HtmlFormatter {
                                         Class Code
                                     </th>
                                     <th scope="col", onclick="sortTable(%d, '%s', true)", class="clickable">
-                                        Class
+                                        %s
                                     </th>
                                     <th scope="col", onclick="sortTable(%d, '%s', true)", class="clickable">
                                         Vendor Name
@@ -302,7 +302,7 @@ public class HtmlFormatter {
                                 </tr>
                             </thead>
                             <tbody>
-                """, 4 - sub, busType, 5 - sub, busType, 6 - sub, busType, 7 - sub, busType, 8 - sub, busType);
+                """, 4 - sub, busType, 5 - sub, busType, 6 - sub, busType, (busType == "pci") ? "Class" : "Device Type" , 7 - sub, busType, 8 - sub, busType);
         for (BusDevice d : devices) {
             table += "            <tr>\n";
             table += String.format("""
