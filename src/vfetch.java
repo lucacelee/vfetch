@@ -1,5 +1,5 @@
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -110,15 +110,19 @@ public class vfetch {
         double parallelTime = Parallelism.runMatrixMultiplication(1000, 4);
         double f = Parallelism.calculateF(baselineTime, parallelTime, 4);
 
+        HashMap<Integer, Double> timeTestResults = new HashMap<Integer, Double>();
+        HashMap<Integer, Double> speedupResults = new HashMap<Integer, Double>();
+        HashMap<Integer, Double> amdahlSpeedups = new HashMap<Integer, Double>();
+
         int coresAvailable = CpuInfo.getCount();
         println("Number of cores available: " + coresAvailable);
 
         int[] threadCounts = {1, 2, 4, coresAvailable};
-         printf("%-25s | %-20s | %-20s | %-20s%n", "Number of threads", "Execution Time(s)", "Measured Speedup", "Amdahl's Limit");
+        printf("%-25s | %-20s | %-20s | %-20s%n", "Number of threads", "Execution Time(s)", "Measured Speedup", "Amdahl's Limit");
         
         for (int thread : threadCounts){
 
-        double duration = Parallelism.runMatrixMultiplication(1000, thread);
+            double duration = Parallelism.runMatrixMultiplication(1000, thread);
             if(thread == 1){
                 baselineTime = duration;
             }
@@ -126,16 +130,29 @@ public class vfetch {
             double speedup = baselineTime / duration;
             double amdahlSpeedup = Parallelism.calculateAmdahlsSpeedup(thread, f);
             printf("%-25d | %-20.4f | %-20.4f | %-20.4f%n", thread, duration, speedup, amdahlSpeedup);
+
+            timeTestResults.put(thread, duration);
+            speedupResults.put(thread, speedup);
+            amdahlSpeedups.put(thread, amdahlSpeedup);
         }
 
         println("\n--- Sampling Core Load using Trial.java ---");
         Trial liveTrial = new Trial(1000); // Sample over 1000ms
+        ArrayList<Double> coreLoads = new ArrayList<Double>();
         for (int i = 0; i < coresAvailable; i++) {
             printf("  Core %d Load: %.2f%%%n", i, liveTrial.getCoreLoad(i));
+            coreLoads.add(liveTrial.getCoreLoad(i));
         }
         printf("  Average Load across all cores: %.2f%%%n", liveTrial.getCpuLoad());
         
-
+        ParallelismRecord parrallelismTest = new ParallelismRecord(
+            baselineTime,
+            coresAvailable,
+            timeTestResults,
+            speedupResults,
+            amdahlSpeedups,
+            coreLoads
+        );
 
         if (writeToFile) {
             HtmlFormatter formatter = new HtmlFormatter(
@@ -144,7 +161,8 @@ public class vfetch {
                 usbDevices,
                 trial.getCpuLoad(),
                 cores,
-                new Ram(memInfo.getTotal(), memInfo.getUsed(), memInfo.getAvailable())
+                new Ram(memInfo.getTotal(), memInfo.getUsed(), memInfo.getAvailable()),
+                parrallelismTest
             );
             formatter.formatHTML();
             DocumentWriter.write(fileName, formatter.htmlDocument());
