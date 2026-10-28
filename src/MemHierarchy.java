@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class MemHierarchy {
-    private static ArrayList<ArrayList<AccessTime>> accessTimeMatrix;
-    private static ArrayList<Cache> caches;
+    private static ArrayList<ArrayList<AccessTime>> accessTimeMatrix = new ArrayList<ArrayList<AccessTime>>();
+    private static ArrayList<Cache> caches = new ArrayList<Cache>();
 
     public static void caching() throws IOException {
         vfetch.println("----------------------------------Working set table----------------------------------");
