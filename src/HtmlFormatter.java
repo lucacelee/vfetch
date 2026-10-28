@@ -449,7 +449,7 @@ public class HtmlFormatter {
                                         Number of Threads
                                     </th>
                                     <th scope="col", onclick="sortTable(1, 'parallelism', false)", class="clickable">
-                                        Execution Time
+                                        Execution Time (s)
                                     </th>
                                     <th scope="col", onclick="sortTable(2, 'parallelism', false)", class="clickable">
                                         Measured Speedup
@@ -473,10 +473,10 @@ public class HtmlFormatter {
                                         %.4f
                                     </td>
                                     <td>
-                                        %.4f
+                                        %.4fx
                                     </td>
                                     <td>
-                                        %.4f
+                                        %.4fx
                                     </td>
                     """, 
                     load, 
