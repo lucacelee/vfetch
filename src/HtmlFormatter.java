@@ -7,7 +7,9 @@ public class HtmlFormatter {
     private final List<Core> cores;
     private final double cpuLoad;
     private final Ram ram;
+    private final ParallelismRecord pResultRecord;
 
+    private boolean printingParallelism = true;
     private boolean formatted = false;
 
     private String html = """
@@ -144,13 +146,14 @@ public class HtmlFormatter {
             </html>
             """;
 
-    public HtmlFormatter(String heading, List<PciDevice> pciDevices, List<USBDevice> usbDevices, double cpuLoad, List<Core> cores, Ram ram) {
+    public HtmlFormatter(String heading, List<PciDevice> pciDevices, List<USBDevice> usbDevices, double cpuLoad, List<Core> cores, Ram ram, ParallelismRecord parallelismRecord) {
         this.heading = heading;
         this.pciDevices = pciDevices;
         this.usbDevices = usbDevices;
         this.cpuLoad = cpuLoad;
         this.cores = cores;
         this.ram = ram;
+        this.pResultRecord = parallelismRecord;
     }
 
     public String htmlDocument() {
@@ -200,6 +203,8 @@ public class HtmlFormatter {
                             </tfoot>
                         </table>
                 """, cpuLoad);
+        body += "            <h3>Load and Parallelism</h3>\n";
+        body += loadAndParallelismTable();
         body += String.format("""
                         <h2>RAM Information</h2>
                         <table>
@@ -340,6 +345,63 @@ public class HtmlFormatter {
                                         %s
                                     </td>
                     """, d.getDeviceId(), d.getClassCode(), d.getClassName(), d.getVendorName(), d.getDeviceName());
+            table += "            </tr>\n";
+        }
+        table += """
+                            </tbody>
+                        </table>
+                """;
+        return table;
+    }
+
+    private String loadAndParallelismTable() {
+        if (!printingParallelism) return "";
+        String table = "";
+        table += String.format("""
+                        <table id="parallelism">
+                            <caption>
+                                Parallelism test for %d available cores
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col", onclick="sortTable(0, 'parallelism', false)", class="clickable">
+                                        Number of Threads
+                                    </th>
+                                    <th scope="col", onclick="sortTable(1, 'parallelism', false)", class="clickable">
+                                        Execution Time
+                                    </th>
+                                    <th scope="col", onclick="sortTable(2, 'parallelism', false)", class="clickable">
+                                        Measured Speedup
+                                    </th>
+                                    <th scope="col", onclick="sortTable(3, 'parallelism', false)", class="clickable">
+                                        Amdahl's Limit
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                """, pResultRecord.coresAvailable());
+        int[] loads = {1, 2, 4, pResultRecord.coresAvailable()};
+        for (int load : loads) {
+
+            table += "            <tr>\n";
+            table += String.format("""
+                                    <td>
+                                        %d
+                                    </td>
+                                    <td>
+                                        %.4f
+                                    </td>
+                                    <td>
+                                        %.4f
+                                    </td>
+                                    <td>
+                                        %.4f
+                                    </td>
+                    """, 
+                    load, 
+                    pResultRecord.timeTaken().get(load).doubleValue(), 
+                    pResultRecord.speedup().get(load).doubleValue(), 
+                    pResultRecord.amdahlSpeedups().get(load).doubleValue());
             table += "            </tr>\n";
         }
         table += """
