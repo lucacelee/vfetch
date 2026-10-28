@@ -247,6 +247,9 @@ public class HtmlFormatter {
         body += "        <h2>PCI Device Information</h2>\n";
         body += "        <p>You can sort the columns by clicking on the labels.</p>\n";
         body += busDeviceTable(pciDevices);
+        body += "        <h2>USB Device Information</h2>\n";
+        body += "        <p>You can sort the columns by clicking on the labels.</p>\n";
+        body += busDeviceTable(usbDevices);
         // We will need another one for USB devices
         html = html.replaceAll("!body;", body);
         formatted = true;
