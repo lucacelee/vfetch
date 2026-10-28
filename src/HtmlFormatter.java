@@ -210,6 +210,7 @@ public class HtmlFormatter {
 
         // Step 2: CPU Information
         body += "        <h2>CPU Information</h2>";
+        body += String.format("        <p>Model: <b>%s</b>,    cores: <b>%d</b></p>", CpuInfo.getModel(), CpuInfo.getCount());
         body += coresTable(this.cores, this.cpuLoad);
         body += "            <h3>Load and Parallelism</h3>\n";
         body += loadAndParallelismTable();
