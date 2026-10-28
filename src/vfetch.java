@@ -240,6 +240,11 @@ public class vfetch {
         System.out.println();
     }
 
+    public static void print(String output) {
+        if (!printToConsole) return;
+        System.out.print(output);
+    }
+
     public static void printf(String formatString, Object... arguments) {
         if (!printToConsole) return;
        System.out.printf(formatString, arguments);
