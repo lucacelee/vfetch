@@ -56,7 +56,7 @@ public class HtmlFormatter {
                         padding: 8px 10px;
                     }
 
-                    td:last-of-type {
+                    .centre {
                         text-align: center;
                     }
 
@@ -314,7 +314,7 @@ public class HtmlFormatter {
             body += String.format("""
                                     <tr>
                                         <td>%d</td>
-                                        <td>%.2f%%</td>
+                                        <td class="centre">%.2f%%</td>
                                     <tr>
                     """, c.core(), c.load());
         }
@@ -325,7 +325,7 @@ public class HtmlFormatter {
                             <tfoot>
                                 <tr>
                                     <th scope="row" colspan="1">Total load</th>
-                                    <td>%.2f%%</td>
+                                    <td class="centre">%.2f%%</td>
                                 </tr>
                             </tfoot>
                         </table>
