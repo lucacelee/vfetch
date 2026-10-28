@@ -171,6 +171,7 @@ public class HtmlFormatter {
         body += coresTable(this.cores, this.cpuLoad);
         body += "            <h3>Load and Parallelism</h3>\n";
         body += loadAndParallelismTable();
+        body += coresTable(pResultRecord.coreLoads(), pResultRecord.cpuLoad());
         body += String.format("""
                         <h2>RAM Information</h2>
                         <table>
