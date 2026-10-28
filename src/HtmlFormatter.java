@@ -496,4 +496,66 @@ public class HtmlFormatter {
                 """;
         return table;
     }
+
+    private String memoryHierarchyTable() {
+        String table = "";
+        //  All of this is just the headers and caption for the table
+        table += """
+                <table id="parallelism">
+                    <caption>
+                        Memory Hierarchy Exploration — Working Set Table
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th scope="col", onclick="sortTable(0, 'parallelism', false)", class="clickable">
+                                Set Size (KiB)
+                            </th>
+                            <th scope="col", onclick="sortTable(1, 'parallelism', false)", class="clickable">
+                                Stride 1 (ns)
+                            </th>
+                            <th scope="col", onclick="sortTable(2, 'parallelism', false)", class="clickable">
+                                Stride 2 (ns)
+                            </th>
+                            <th scope="col", onclick="sortTable(3, 'parallelism', false)", class="clickable">
+                                Stride 4 (ns)
+                            </th>
+                            <th scope="col", onclick="sortTable(4, 'parallelism', false)", class="clickable">
+                                Stride 8 (ns)
+                            </th>
+                            <th scope="col", onclick="sortTable(5, 'parallelism', false)", class="clickable">
+                                Stride 16 (ns)
+                            </th>
+                            <th scope="col", onclick="sortTable(6, 'parallelism', false)", class="clickable">
+                                Stride 32 (ns)
+                            </th>
+                            <th scope="col", onclick="sortTable(7, 'parallelism', false)", class="clickable">
+                                Stride 64 (ns)
+                            </th>
+                            <th scope="col", onclick="sortTable(8, 'parallelism', false)", class="clickable">
+                                Stride 128 (ns)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                """;
+        
+        // This loop is for the rows of the table
+        for (ArrayList<AccessTime> accessTimes : accessTimeMatrix) {
+            table += "            <tr>\n";
+            // This is for each column
+            for (AccessTime t : accessTimes) {
+                table += String.format("""
+                                        <td>
+                                            %.2f
+                                        </td>
+                        """, t.time());
+            }
+            table += "            </tr>\n";
+        }
+        table += """
+                            </tbody>
+                        </table>
+                """;
+        return table;
+    }
 }
