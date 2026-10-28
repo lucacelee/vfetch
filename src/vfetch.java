@@ -56,6 +56,7 @@ public class vfetch {
         }
         memInfo.displayPercentage();
         println();
+        MemHierarchy.caching();
 
         //Requirement 3 + 6: Pci devices and analysis
 
@@ -239,6 +240,11 @@ public class vfetch {
     public static void println() {
         if (!printToConsole) return;
         System.out.println();
+    }
+
+    public static void print(String output) {
+        if (!printToConsole) return;
+        System.out.print(output);
     }
 
     public static void printf(String formatString, Object... arguments) {
