@@ -503,37 +503,37 @@ public class HtmlFormatter {
         String table = "";
         //  All of this is just the headers and caption for the table
         table += """
-                <table id="parallelism">
+                <table>
                     <caption>
                         Memory Hierarchy Exploration — Working Set Table
                     </caption>
                     <thead>
                         <tr>
-                            <th scope="col", onclick="sortTable(0, 'parallelism', false)", class="clickable">
+                            <th>
                                 Set Size (KiB)
                             </th>
-                            <th scope="col", onclick="sortTable(1, 'parallelism', false)", class="clickable">
+                            <th>
                                 Stride 1 (ns)
                             </th>
-                            <th scope="col", onclick="sortTable(2, 'parallelism', false)", class="clickable">
+                            <th>
                                 Stride 2 (ns)
                             </th>
-                            <th scope="col", onclick="sortTable(3, 'parallelism', false)", class="clickable">
+                            <th>
                                 Stride 4 (ns)
                             </th>
-                            <th scope="col", onclick="sortTable(4, 'parallelism', false)", class="clickable">
+                            <th>
                                 Stride 8 (ns)
                             </th>
-                            <th scope="col", onclick="sortTable(5, 'parallelism', false)", class="clickable">
+                            <th>
                                 Stride 16 (ns)
                             </th>
-                            <th scope="col", onclick="sortTable(6, 'parallelism', false)", class="clickable">
+                            <th>
                                 Stride 32 (ns)
                             </th>
-                            <th scope="col", onclick="sortTable(7, 'parallelism', false)", class="clickable">
+                            <th>
                                 Stride 64 (ns)
                             </th>
-                            <th scope="col", onclick="sortTable(8, 'parallelism', false)", class="clickable">
+                            <th>
                                 Stride 128 (ns)
                             </th>
                         </tr>
@@ -569,22 +569,22 @@ public class HtmlFormatter {
     private String cacheTable() {
         String table = "";
         table += """
-                <table id="parallelism">
+                <table>
                     <caption>
                         Caches present on this machine
                     </caption>
                     <thead>
                         <tr>
-                            <th scope="col", onclick="sortTable(0, 'parallelism', false)", class="clickable">
+                            <th scope="col">
                                 Cache Level
                             </th>
-                            <th scope="col", onclick="sortTable(1, 'parallelism', false)", class="clickable">
+                            <th scope="col">
                                 Cache Type
                             </th>
-                            <th scope="col", onclick="sortTable(2, 'parallelism', false)", class="clickable">
+                            <th scope="col">
                                 Cache Size
                             </th>
-                            <th scope="col", onclick="sortTable(3, 'parallelism', false)", class="clickable">
+                            <th scope="col">
                                 Line Size
                             </th>
                         </tr>
