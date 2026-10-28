@@ -260,6 +260,8 @@ public class HtmlFormatter {
                 ram.freePercentage()*100,
                 ram.totalPercentage()*100
             );
+        body += memoryHierarchyTable();
+        body += cacheTable();
 
         // Step 4: PCI Device Information
         body += "        <h2>PCI Device Information</h2>\n";
@@ -542,6 +544,11 @@ public class HtmlFormatter {
         // This loop is for the rows of the table
         for (ArrayList<AccessTime> accessTimes : accessTimeMatrix) {
             table += "            <tr>\n";
+            table += String.format("""
+                            <th scope="row"">
+                                %d
+                            </th>
+                    """, accessTimes.get(0).setSize());
             // This is for each column
             for (AccessTime t : accessTimes) {
                 table += String.format("""
