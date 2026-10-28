@@ -71,6 +71,11 @@ public class usbInfo
         return hex(index, "idProduct");
     }
 
+    public static int getClassCode(int index)
+    {
+        return hex(index, "bDeviceClass");
+    }
+
     /** The manufacturer text reported by the device itself, or "" if it has none. */
     public static String getManufacturer(int index)
     {
