@@ -166,43 +166,9 @@ public class HtmlFormatter {
         String body = "";
 
         // Populating the HTML with data
-        body += "<h1>" + heading + "</h1>\n";
-        body += """
-                        <h2>CPU Information</h2>
-                        <table>
-                            <caption>
-                                CPU load per core
-                            </caption>
-                            <thead>
-                                <tr>
-                                    <th scope="col">
-                                        Core
-                                    </th>
-                                    <th scope="col">
-                                        Load
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                """;
-        for (Core c : cores) {
-            body += String.format("""
-                                    <tr>
-                                        <td>%d</td>
-                                        <td>%.2f%%</td>
-                                    <tr>
-                    """, c.core(), c.load());
-        }
-        body += String.format("""
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th scope="row" colspan="1">Total load</th>
-                                    <td>%.2f%%</td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                """, cpuLoad);
+        body += "    <h1>" + heading + "</h1>\n";
+        body += "        <h2>CPU Information</h2>";
+        body += coresTable(this.cores, this.cpuLoad);
         body += "            <h3>Load and Parallelism</h3>\n";
         body += loadAndParallelismTable();
         body += String.format("""
@@ -258,6 +224,46 @@ public class HtmlFormatter {
         // We will need another one for USB devices
         html = html.replaceAll("!body;", body);
         formatted = true;
+    }
+
+    private String coresTable(List<Core> cores, double cpuLoad) {
+        String body = "";
+        body += """
+                        <table>
+                            <caption>
+                                CPU load per core
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">
+                                        Core
+                                    </th>
+                                    <th scope="col">
+                                        Load
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                """;
+        for (Core c : cores) {
+            body += String.format("""
+                                    <tr>
+                                        <td>%d</td>
+                                        <td>%.2f%%</td>
+                                    <tr>
+                    """, c.core(), c.load());
+        }
+        body += String.format("""
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th scope="row" colspan="1">Total load</th>
+                                    <td>%.2f%%</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                """, cpuLoad);
+        return body;
     }
 
     private String busDeviceTable(List<? extends BusDevice> devices) {
