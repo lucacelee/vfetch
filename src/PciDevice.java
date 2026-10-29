@@ -51,12 +51,14 @@ public class PciDevice extends BusDevice{
     //lets you compare and sort integers with multiple fields (bus, device, function)
     //https://docs.oracle.com/javase/8/docs/api/java/util/Comparator.html
 
+    @SuppressWarnings("null")
     public static void sortByAddress(List<PciDevice> list){
         list.sort(Comparator.comparingInt(PciDevice::getBus).thenComparingInt(PciDevice::getDevice).thenComparingInt(PciDevice::getFunction));
     }
 
     //this is the alphabetical one
 
+    @SuppressWarnings("null")
     public static void sortByVendorName(List<PciDevice> list){
         list.sort(Comparator.comparing(PciDevice::getVendorName, String.CASE_INSENSITIVE_ORDER));
     }
