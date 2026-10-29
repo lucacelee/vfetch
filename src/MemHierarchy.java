@@ -8,15 +8,16 @@ public class MemHierarchy {
 
     public static void caching() throws IOException {
         vfetch.println("----------------------------------Working set table----------------------------------");
-        vfetch.println("Set size   Stride 1    Stride 2    Stride 4    Stride 8    Stride 16   Stride 32   Stride 64   Stride 128");
+        vfetch.println("Set size   Stride 1    Stride 2    Stride 4    Stride 8    Stride 16   Stride 32   Stride 64   Stride 128  Stride 256");
         vfetch.println(" (KiB)");
         Random random = new Random();
         int[] estimating = new int[1024 * 1024 * 16];
         for (int i = 0; i < estimating.length; i++){
             estimating[i] = random.nextInt();
         }
-        //creates an 64Mib array that larger than the L3 cache and fills it with random numbers to prevent optimization
-        int trialSize = 10000;
+        //creates an 64MiB array of data and fills it with random numbers to prevent optimization
+        int maxTrialSize = 10000000; //Roughly we want about 10 million accesses per trial so this is to prevent it going over constantly 
+        long sum = 0;
         for(int workingSet = 1024; workingSet <= estimating.length; workingSet *= 2){
 
             if ((workingSet * 4) /1024 > 10000) {
@@ -31,33 +32,49 @@ public class MemHierarchy {
                 vfetch.print((workingSet * 4) /1024 + "          ");
             }
            //Prints the working set sizes in Kib (else if is for formatting the table)
-
-            for (int stride = 1; stride <= 128; stride *= 2){
+            
+            for (int stride = 1; stride <= 256; stride *= 2){
                  //strides choose how many integers are skipped during the adding process
-                long accesses = 0;
-                long startTime = System.nanoTime();
+                 // 1 Stride is equal to 4 bytes as we are moving in ints
+                 // This also means the max size we will move by is 1024 bytes each stride
 
-                for (int trial = 0; trial < trialSize; trial++) {
+
+                long accesses = 0;
+                int accessPerTrial = (workingSet + stride - 1) / stride;
+                int currentTrialSize = Math.max(1, maxTrialSize / accessPerTrial );
+                // This continues the notion of us wanting roughly 10 million accesses per Trial
+               
+                for (int i = 0; i < workingSet; i+= stride) {
+                        sum += estimating[i];
+                    } 
+                    // warm up trial to prepare the compiler for the main trial
+                    // otherwise it could skew the table results
+                
+                long startTime = System.nanoTime();
+                for (int trial = 0; trial < currentTrialSize; trial++) {
                     for (int i = 0; i < workingSet; i+= stride) {
+                        sum += estimating[i];
                         accesses++;
                     }
-                    //adds all of the random numbers and records the time it takes to do so
                 }
-                long endTime = System.nanoTime();        
-                double timePerAccess = (endTime - startTime) / (double) accesses; //returns nanoseconds per access as an average for all accesses
+                long endTime = System.nanoTime(); 
+                // adds all of the random numbers and records the time it takes to do so
+                // we are looking for large jumps between access times which can indicate line sizes (rows) or cache sizes (columns)       
+                double timePerAccess = (endTime - startTime) / (double) accesses; 
+                //returns nanoseconds per access as an average for all accesses for a more clearer result
                 if (timePerAccess > 10) {
                     vfetch.printf("%.2f ns    ", timePerAccess);
                 } else {
                 vfetch.printf("%.2f  ns    ", timePerAccess);
                 }
+                // again just formatting the table if averages are over 10ns
             }
-            if (trialSize > 50){
-                 trialSize = Math.max(50, trialSize/2);
-                //This just reduces the amount or trials ran so that larger working sets are not doing 1000 trials each
-                //otherwise this would lead to later working sets having almost a billion accesses
-            }
+            
             vfetch.println();
+            
         }
+        vfetch.println();
+        vfetch.println("final sum:" + sum); //small check to make sure sum is used and the compiler is happy
         vfetch.println();
         for (int i = 0; i < 4; i++) {
             Path cacheDir = Path.of("/sys/devices/system/cpu/cpu0/cache/index" + i);
