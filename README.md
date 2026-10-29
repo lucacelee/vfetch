@@ -43,3 +43,20 @@ The repository includes a Gradle Wrapper (`gradlew`), ensuring the application i
 
     This will generate a folder with the default name 'Hardware Details.html' in the root of the project folder.
     Opening that folder should open a html tab on your browser.
+
+## Where the information comes from
+
+**Processor Model & Core Count** | `CpuInfo.java` |
+**CPU Busy & Idle Ticks** | `CpuInfo.java`, `Trial.java` |
+**Core Load Representation** | `Core.java` |
+**Memory (RAM) Usage** | `memInfo.java`, `Ram.java` |
+**CPU Cache Hierarchy Info** | `MemHierarchy.java`, `Cache.java` |
+**Memory Latency Benchmark** | `MemHierarchy.java`, `AccessTime.java`|
+**PCI Devices** | `pciInfo.java`, `PciDevice.java` |
+**USB Devices** | `usbInfo.java`, `USBDevice.java` |
+**Device & Class Name Lookup** | `idLookup.java` |
+**Shared Hardware Device Base** | `BusDevice.java`, `BusType.java` |
+**Multi-Core Parallelism Benchmark** | `Parallelism.java`, `ParallelismRecord.java` |
+**HTML Report Formatting** | `HtmlFormatter.java` |
+**HTML File Output** | `DocumentWriter.java` |
+**CLI Execution & Coordination** | `vfetch.java` |
