@@ -174,6 +174,27 @@ public class vfetch {
             formatter.formatHTML();
             DocumentWriter.write(fileName, formatter.htmlDocument());
         }
+
+        if (serveHtml) {
+            formatter.setDynamic();
+            WebServer server = new WebServer(8080);
+            Thread repeatFormattingThread = new Thread(() -> {
+                while (true) {
+                    formatter.formatHTML();
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        println(e.getMessage());
+                    }
+                }
+            });
+
+            repeatFormattingThread.start();
+
+            server.create();
+            server.setResponse(formatter.htmlDocument());
+            server.start();
+        }
     }
 
     private static void processArguments(String[] args) {
