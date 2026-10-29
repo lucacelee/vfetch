@@ -3,11 +3,11 @@ import java.util.List;
 
 public class HtmlFormatter {
     private final String heading;
-    private final List<PciDevice> pciDevices;
-    private final List<USBDevice> usbDevices;
-    private final List<Core> cores;
-    private final double cpuLoad;
-    private final Ram ram;
+    private List<PciDevice> pciDevices;
+    private List<USBDevice> usbDevices;
+    private List<Core> cores;
+    private double cpuLoad;
+    private Ram ram;
     private final ParallelismRecord pResultRecord;
     private final ArrayList<ArrayList<AccessTime>> accessTimeMatrix;
     private final ArrayList<Cache> caches;
@@ -178,6 +178,14 @@ public class HtmlFormatter {
         this.caches = caches;
 
         if (parallelismRecord == null) this.printingParallelism = false;
+    }
+
+    public void updateStaticData(List<PciDevice> pciDevices, List<USBDevice> usbDevices, double cpuLoad, List<Core> cores, Ram ram) {
+        this.pciDevices = pciDevices;
+        this.usbDevices = usbDevices;
+        this.cpuLoad = cpuLoad;
+        this.cores = cores;
+        this.ram = ram;
     }
 
     public void setDynamic() {

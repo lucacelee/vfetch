@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,12 +44,7 @@ public class vfetch {
         Trial trial = new Trial(1000);
         printf("The average load across all cores is %.2f%%%n", trial.getCpuLoad());
 
-        List<Core> cores = new ArrayList<Core>();       // This unifies the code between the CLI and HTML formatter
-        for(int i = 0; i < CpuInfo.getCount(); i++){
-            Core c = new Core(i, trial.getCoreLoad(i));
-            println(c.toString());
-            cores.add(c);
-        }
+        List<Core> cores = createCoreList(trial);
 
         //Requirement 2: Memory
         
@@ -176,13 +172,49 @@ public class vfetch {
         }
 
         if (serveHtml) {
-            formatter.setDynamic();
             WebServer server = new WebServer(8080);
             Thread repeatFormattingThread = new Thread(() -> {
                 while (true) {
-                    formatter.formatHTML();
+                    printToConsole = false;
+                    Trial dynamicTrial = new Trial(1000);
+                    List<Core> dynamicCores = createCoreList(dynamicTrial);
+                    List<PciDevice> dynamicPciDevices;
+
                     try {
-                        Thread.sleep(2000);
+                        dynamicPciDevices = PciDevice.mapDevices();
+                    } catch (IOException e) {
+                        dynamicPciDevices = pciDevices;
+                        System.err.println("Failed to fetch new PCI devices!");
+                        e.printStackTrace();
+                    }
+
+                    ArrayList<USBDevice> dynamicUsbDevices;
+
+                    try {
+                        dynamicUsbDevices = USBDevice.mapDevices();
+                    } catch (IOException e) {
+                        dynamicUsbDevices = usbDevices;
+                        System.err.println("Failed to fetch new USB devices!");
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        formatter.updateStaticData(
+                            dynamicPciDevices,
+                            dynamicUsbDevices, 
+                            dynamicTrial.getCpuLoad(), 
+                            dynamicCores, 
+                            new Ram(memInfo.getTotal(), memInfo.getUsed(), memInfo.getAvailable())
+                        );
+                    } catch (Exception e) {
+                        System.err.println("Failed to update the formatter!");
+                        e.printStackTrace();
+                    }
+                    formatter.setDynamic();
+                    formatter.formatHTML();
+                    server.setResponse(formatter.htmlDocument());
+                    try {
+                        Thread.sleep(900);
                     } catch (InterruptedException e) {
                         println(e.getMessage());
                     }
@@ -192,9 +224,18 @@ public class vfetch {
             repeatFormattingThread.start();
 
             server.create();
-            server.setResponse(formatter.htmlDocument());
             server.start();
         }
+    }
+
+    private static List<Core> createCoreList(Trial trial) {
+        List<Core> cores = new ArrayList<Core>();       // This unifies the code between the CLI and HTML formatter
+        for(int i = 0; i < CpuInfo.getCount(); i++){
+            Core c = new Core(i, trial.getCoreLoad(i));
+            println(c.toString());
+            cores.add(c);
+        }
+        return cores;
     }
 
     private static void processArguments(String[] args) {
