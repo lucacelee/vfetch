@@ -41,7 +41,7 @@ public class USBDevice extends BusDevice
         this.deviceName = deviceName;
         this.className = className;
         this.address = null;
-        this.typeOfBus = "usb";
+        this.typeOfBus = BusType.USB;
     }
 
     public static ArrayList<USBDevice> mapDevices() throws IOException{

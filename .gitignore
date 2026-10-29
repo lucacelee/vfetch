@@ -30,3 +30,6 @@ build
 
 # Ignore Kotlin plugin data
 .kotlin
+
+# Ignore VS Code's settings
+.vscode

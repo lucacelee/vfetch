@@ -13,9 +13,9 @@ public abstract class BusDevice {
     protected String className;
     protected String address;
     protected static int count;
-    protected String typeOfBus;
+    protected BusType typeOfBus;
 
-    public String busType() {
+    public BusType busType() {
         return typeOfBus;
     }
 

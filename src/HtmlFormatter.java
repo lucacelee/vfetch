@@ -334,8 +334,14 @@ public class HtmlFormatter {
         return body;
     }
 
+    @SuppressWarnings("null")
     private String busDeviceTable(List<? extends BusDevice> devices) {
-        String busType = devices.get(0).busType().toLowerCase();
+        BusType busType;
+        if (devices.size() > 0) {
+            busType = devices.get(0).busType();
+        } else {
+            busType = BusType.UNKNOWN;
+        }
         String table = "";
 
         // New table declaration
@@ -352,20 +358,20 @@ public class HtmlFormatter {
                                     <th scope="col", onclick="sortTable(1, '%s', false)", class="clickable">
                                         Device
                                     </th>
-                """, busType, (busType == "pci") ? "PCI" : "USB", busType, busType);
+                """, busType, busType, busType, busType);
         
         // PCI devices have extra fields that can be filled, so for them we add 2 extra columns
-        if (busType == "pci") {
+        if (busType == BusType.PCI) {
             table += """
-                                        <th scope="col", onclick="sortTable(2, 'pci', false)", class="clickable">
+                                        <th scope="col", onclick="sortTable(2, 'PCI', false)", class="clickable">
                                             Function
                                         </th>
-                                        <th scope="col", onclick="sortTable(3, 'pci', true)", class="clickable">
+                                        <th scope="col", onclick="sortTable(3, 'PCI', true)", class="clickable">
                                             Address
                                         </th>
                     """;
         }
-        int sub = (busType == "pci") ? 0 : 2;
+        int sub = (busType == BusType.PCI) ? 0 : 2;
         table += String.format("""
                                     <th scope="col", onclick="sortTable(%d, '%s', false)", class="clickable">
                                         ID
@@ -389,7 +395,7 @@ public class HtmlFormatter {
                 4 - sub, busType,
                 5 - sub, busType,
                 6 - sub, busType,
-                (busType == "pci") ? "Class" : "Device Type" ,
+                (busType == BusType.PCI) ? "Class" : "Device Type" ,
                 7 - sub, busType,
                 8 - sub, busType);
 
@@ -404,7 +410,7 @@ public class HtmlFormatter {
                                         %d
                                     </td>
                     """, d.getBus(), d.getDevice());
-            if (busType == "pci") {
+            if (busType == BusType.PCI) {
                 table += String.format("""
                                         <td>
                                             %d
