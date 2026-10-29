@@ -18,7 +18,7 @@ public class PciDevice extends BusDevice{
             this.deviceName = deviceName;
             this.className = className;
             this.address = address;
-            this.typeOfBus = "pci";
+            this.typeOfBus = BusType.PCI;
     }
 
     /* creating a method that takes each of the pci devices read by Linux, and
