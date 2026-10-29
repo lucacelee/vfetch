@@ -15,6 +15,7 @@ public class vfetch {
     private static boolean writeToFile = false;
     private static boolean printToConsole = true;
     private static boolean printHelpMessage = false;
+    private static boolean excludeCpuHeavyTests = false;
 
     private static String fileName = "Hardware Details.html";
     public static void main(String[] args) throws Exception {
@@ -97,55 +98,58 @@ public class vfetch {
         println();
 
         //Requirement 5: Load and parellelism
-        println("-------------LOAD AND PARALLELISM--------------");
-        double baselineTime = Parallelism.runMatrixMultiplication(1000, 1);
-        double parallelTime = Parallelism.runMatrixMultiplication(1000, 4);
-        double f = Parallelism.calculateF(baselineTime, parallelTime, 4);
+        ParallelismRecord parrallelismTest = null;
+        if (!excludeCpuHeavyTests) {
+            println("-------------LOAD AND PARALLELISM--------------");
+            double baselineTime = Parallelism.runMatrixMultiplication(1000, 1);
+            double parallelTime = Parallelism.runMatrixMultiplication(1000, 4);
+            double f = Parallelism.calculateF(baselineTime, parallelTime, 4);
 
-        HashMap<Integer, Double> timeTestResults = new HashMap<Integer, Double>();
-        HashMap<Integer, Double> speedupResults = new HashMap<Integer, Double>();
-        HashMap<Integer, Double> amdahlSpeedups = new HashMap<Integer, Double>();
+            HashMap<Integer, Double> timeTestResults = new HashMap<Integer, Double>();
+            HashMap<Integer, Double> speedupResults = new HashMap<Integer, Double>();
+            HashMap<Integer, Double> amdahlSpeedups = new HashMap<Integer, Double>();
 
-        int coresAvailable = CpuInfo.getCount();
-        println("Number of cores available: " + coresAvailable);
+            int coresAvailable = CpuInfo.getCount();
+            println("Number of cores available: " + coresAvailable);
 
-        int[] threadCounts = {1, 2, 4, coresAvailable};
-        printf("%-25s | %-20s | %-20s | %-20s%n", "Number of threads", "Execution Time(s)", "Measured Speedup", "Amdahl's Limit");
-        
-        for (int thread : threadCounts){
+            int[] threadCounts = {1, 2, 4, coresAvailable};
+            printf("%-25s | %-20s | %-20s | %-20s%n", "Number of threads", "Execution Time(s)", "Measured Speedup", "Amdahl's Limit");
+            
+            for (int thread : threadCounts){
 
-            double duration = Parallelism.runMatrixMultiplication(1000, thread);
-            if(thread == 1){
-                baselineTime = duration;
+                double duration = Parallelism.runMatrixMultiplication(1000, thread);
+                if(thread == 1){
+                    baselineTime = duration;
+                }
+            
+                double speedup = baselineTime / duration;
+                double amdahlSpeedup = Parallelism.calculateAmdahlsSpeedup(thread, f);
+                printf("%-25d | %-20.4f | %-20.4f | %-20.4f%n", thread, duration, speedup, amdahlSpeedup);
+
+                timeTestResults.put(thread, duration);
+                speedupResults.put(thread, speedup);
+                amdahlSpeedups.put(thread, amdahlSpeedup);
             }
-          
-            double speedup = baselineTime / duration;
-            double amdahlSpeedup = Parallelism.calculateAmdahlsSpeedup(thread, f);
-            printf("%-25d | %-20.4f | %-20.4f | %-20.4f%n", thread, duration, speedup, amdahlSpeedup);
 
-            timeTestResults.put(thread, duration);
-            speedupResults.put(thread, speedup);
-            amdahlSpeedups.put(thread, amdahlSpeedup);
+            println("\n--- Sampling Core Load using Trial.java ---");
+            Trial liveTrial = Parallelism.trial();
+            ArrayList<Core> coreLoads = new ArrayList<Core>();
+            for (int i = 0; i < CpuInfo.getCount(); i++) {
+                vfetch.printf("  Core %d Load: %.2f%%%n", i, liveTrial.getCoreLoad(i));
+                coreLoads.add(new Core(i, liveTrial.getCoreLoad(i)));
+            }
+            printf("  Average Load across all cores: %.2f%%%n", liveTrial.getCpuLoad());
+            
+            parrallelismTest = new ParallelismRecord(
+                baselineTime,
+                coresAvailable,
+                timeTestResults,
+                speedupResults,
+                amdahlSpeedups,
+                coreLoads,
+                liveTrial.getCpuLoad()
+            );
         }
-
-        println("\n--- Sampling Core Load using Trial.java ---");
-        Trial liveTrial = Parallelism.trial();
-        ArrayList<Core> coreLoads = new ArrayList<Core>();
-        for (int i = 0; i < CpuInfo.getCount(); i++) {
-            vfetch.printf("  Core %d Load: %.2f%%%n", i, liveTrial.getCoreLoad(i));
-            coreLoads.add(new Core(i, liveTrial.getCoreLoad(i)));
-        }
-        printf("  Average Load across all cores: %.2f%%%n", liveTrial.getCpuLoad());
-        
-        ParallelismRecord parrallelismTest = new ParallelismRecord(
-            baselineTime,
-            coresAvailable,
-            timeTestResults,
-            speedupResults,
-            amdahlSpeedups,
-            coreLoads,
-            liveTrial.getCpuLoad()
-        );
 
         if (writeToFile) {
             HtmlFormatter formatter = new HtmlFormatter(
@@ -185,6 +189,10 @@ public class vfetch {
                                 printHelpMessage = true;
                                 previousCommand = "help";
                                 break;
+                            case 'e':
+                            excludeCpuHeavyTests = true;
+                            previousCommand = "exclude-cpu-tests";
+                            break;
                         }
                     }
                 } else {
@@ -202,6 +210,10 @@ public class vfetch {
                             printHelpMessage = true;
                             previousCommand = "help";
                             break;
+                        case "exclude-cpu-tests":
+                            excludeCpuHeavyTests = true;
+                            previousCommand = "exclude-cpu-tests";
+                            break;
                     }
                 }
             } else {
@@ -217,11 +229,13 @@ public class vfetch {
                 vfetch - a program that gives you your system hardware details
                 Usage: vfetch [options] [output_file_name]
                     options:
-                        -h --help       Print this message
-                        -s --silent     Execute without printing anything
-                        -o --output     Create a HTML document, where
-                                        [output_file_name] is its name.
-                                        By default it's "Hardware Details.html".
+                        -h --help               Print this message
+                        -s --silent             Execute without printing anything
+                        -o --output             Create a HTML document, where
+                                                [output_file_name] is its name.
+                                                By default it's "Hardware Details.html".
+                        -e --exclude-cpu-tests  Run the program without conducting
+                                                CPU-heavy tests
                 """);
     }
 
