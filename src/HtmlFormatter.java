@@ -313,19 +313,19 @@ public class HtmlFormatter {
 
         // Step 4: PCI Device Information
         body += "        <h2>PCI Device Information</h2>\n";
-        body += "        <p>You can sort the columns by clicking on the labels.</p>\n";
+        body += (dynamicPage) ? "" : "        <p>You can sort the columns by clicking on the labels.</p>\n";
         body += busDeviceTable(pciDevices);
 
         // Step 5: USB Device Information
         body += "        <h2>USB Device Information</h2>\n";
-        body += "        <p>You can sort the columns by clicking on the labels.</p>\n";
+        body += (dynamicPage) ? "" : "        <p>You can sort the columns by clicking on the labels.</p>\n";
         body += busDeviceTable(usbDevices);
 
         // Step 6: Fill in the data into the template
         output = html.replaceAll("!body;", body).replaceAll("!title;", heading);
 
         if (dynamicPage) {
-            output = output.replaceAll("!refreshtag;", "<meta http-equiv=\"refresh\" content=\"2\">");
+            output = output.replaceAll("!refreshtag;", "<meta http-equiv=\"refresh\" content=\"2\">").replaceAll("cursor: pointer;", "");
         } else {
             output = output.replaceAll("!refreshtag;", "");
         }
