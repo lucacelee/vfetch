@@ -16,6 +16,7 @@ public class vfetch {
     private static boolean printToConsole = true;
     private static boolean printHelpMessage = false;
     private static boolean excludeCpuHeavyTests = false;
+    private static boolean serveHtml = false;
 
     private static String fileName = "Hardware Details.html";
     public static void main(String[] args) throws Exception {
@@ -155,18 +156,21 @@ public class vfetch {
             );
         }
 
+        if (!writeToFile && !serveHtml) return;
+
+        HtmlFormatter formatter = new HtmlFormatter(
+            "System Information Breakdown",
+            pciDevices,
+            usbDevices,
+            trial.getCpuLoad(),
+            cores,
+            new Ram(memInfo.getTotal(), memInfo.getUsed(), memInfo.getAvailable()),
+            parrallelismTest,
+            MemHierarchy.getAccessTimeMatrix(),
+            MemHierarchy.getCaches()
+        );
+        
         if (writeToFile) {
-            HtmlFormatter formatter = new HtmlFormatter(
-                "System Information Breakdown",
-                pciDevices,
-                usbDevices,
-                trial.getCpuLoad(),
-                cores,
-                new Ram(memInfo.getTotal(), memInfo.getUsed(), memInfo.getAvailable()),
-                parrallelismTest,
-                MemHierarchy.getAccessTimeMatrix(),
-                MemHierarchy.getCaches()
-            );
             formatter.formatHTML();
             DocumentWriter.write(fileName, formatter.htmlDocument());
         }
@@ -194,9 +198,13 @@ public class vfetch {
                                 previousCommand = "help";
                                 break;
                             case 'e':
-                            excludeCpuHeavyTests = true;
-                            previousCommand = "exclude-cpu-tests";
-                            break;
+                                excludeCpuHeavyTests = true;
+                                previousCommand = "exclude-cpu-tests";
+                                break;
+                            case 'l':
+                                serveHtml = true;
+                                previousCommand = "live-updates";
+                                break;
                         }
                     }
                 } else {
@@ -217,6 +225,10 @@ public class vfetch {
                         case "exclude-cpu-tests":
                             excludeCpuHeavyTests = true;
                             previousCommand = "exclude-cpu-tests";
+                            break;
+                        case "live-updates":
+                            serveHtml = true;
+                            previousCommand = "live-updates";
                             break;
                     }
                 }
@@ -240,6 +252,8 @@ public class vfetch {
                                                 By default it's "Hardware Details.html".
                         -e --exclude-cpu-tests  Run the program without conducting
                                                 CPU-heavy tests
+                        -l --live-updates       Starts a HTTP server, which serves live
+                                                system updates through the HTML page
                 """);
     }
 
