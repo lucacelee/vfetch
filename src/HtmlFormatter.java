@@ -76,10 +76,18 @@ public class HtmlFormatter {
 
                     body {
                         font-family: sans-serif;
+                        max-width: 1280px;
+                        margin: auto;
+                        margin-top: 5em;
+                        margin-bottom: 3em;
                     }
 
                     .clickable {
                         cursor: pointer;
+                    }
+
+                    .centre-table {
+                        margin: auto;
                     }
                 </style>
                 <head>
@@ -258,7 +266,7 @@ public class HtmlFormatter {
         // Step 3: RAM Information
         body += String.format("""
                         <h2>RAM Information</h2>
-                        <table>
+                        <table class="centre-table">
                             <caption>
                                 RAM usage breakdown
                             </caption>
@@ -391,7 +399,7 @@ public class HtmlFormatter {
 
         // New table declaration
         table += String.format("""
-                        <table id="%s">
+                        <table id="%s" class="centre-table">
                             <caption>
                                 %s bus devices
                             </caption>
@@ -555,7 +563,7 @@ public class HtmlFormatter {
         String table = "";
         //  All of this is just the headers and caption for the table
         table += """
-                <table>
+                <table class="centre-table">
                     <caption>
                         Memory Hierarchy Exploration — Working Set Table
                     </caption>
@@ -624,7 +632,7 @@ public class HtmlFormatter {
     private String cacheTable() {
         String table = "";
         table += """
-                <table>
+                <table class="centre-table">
                     <caption>
                         Caches present on this machine
                     </caption>
