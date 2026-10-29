@@ -171,6 +171,8 @@ public class HtmlFormatter {
         this.pResultRecord = parallelismRecord;
         this.accessTimeMatrix = accessTimeMatrix;
         this.caches = caches;
+
+        if (parallelismRecord == null) this.printingParallelism = false;
     }
 
     // This is to access the document
@@ -212,9 +214,11 @@ public class HtmlFormatter {
         body += "        <h2>CPU Information</h2>";
         body += String.format("        <p>Model: <b>%s</b>,    cores: <b>%d</b></p>", CpuInfo.getModel(), CpuInfo.getCount());
         body += coresTable(this.cores, this.cpuLoad);
-        body += "            <h3>Load and Parallelism</h3>\n";
-        body += loadAndParallelismTable();
-        body += coresTable(pResultRecord.coreLoads(), pResultRecord.cpuLoad());
+        if (printingParallelism) {
+            body += "            <h3>Load and Parallelism</h3>\n";
+            body += loadAndParallelismTable();
+            body += coresTable(pResultRecord.coreLoads(), pResultRecord.cpuLoad());
+        }
 
         // Step 3: RAM Information
         body += String.format("""
