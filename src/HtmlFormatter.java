@@ -15,6 +15,7 @@ public class HtmlFormatter {
     private boolean dynamicPage = false;
 
     private boolean printingParallelism = true;
+    private boolean printingMemoryHierarchy = true;
     private boolean formatted = false;
 
     /*  
@@ -186,6 +187,7 @@ public class HtmlFormatter {
         this.caches = caches;
 
         if (parallelismRecord == null) this.printingParallelism = false;
+        if (accessTimeMatrix == null) this.printingMemoryHierarchy = false;
     }
 
     public void updateStaticData(List<PciDevice> pciDevices, List<USBDevice> usbDevices, double cpuLoad, List<Core> cores, Ram ram) {
@@ -308,8 +310,10 @@ public class HtmlFormatter {
                 ram.freePercentage()*100,
                 ram.totalPercentage()*100
             );
-        body += memoryHierarchyTable();
-        body += cacheTable();
+        if (printingMemoryHierarchy) {
+            body += memoryHierarchyTable();
+            body += cacheTable();
+        }
 
         // Step 4: PCI Device Information
         body += "        <h2>PCI Device Information</h2>\n";
