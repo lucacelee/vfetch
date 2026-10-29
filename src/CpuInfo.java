@@ -1,4 +1,5 @@
 import java.nio.file.Path;
+import java.util.ArrayList;
 
 /**
  * Information about the processor, read from /proc/cpuinfo and /proc/stat.
@@ -20,6 +21,22 @@ public class CpuInfo
             if (line.startsWith("processor"))
                 count++;
         return count;
+    }
+
+    public static int getPhysicalCoreCount() {
+        ArrayList<String> instances = new ArrayList<String>();
+        for (String line : sysFile.lines(CPUINFO)) {
+            if (line.startsWith("core id")) {
+                boolean matches = false;
+                for (String i : instances) {
+                    if (line.equals(i)) {
+                        matches = true;
+                    }
+                }
+                if (!matches) instances.add(line);
+            }
+        }
+        return instances.size();
     }
 
     /**
