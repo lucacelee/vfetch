@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class HtmlFormatter {
@@ -8,6 +9,8 @@ public class HtmlFormatter {
     private final double cpuLoad;
     private final Ram ram;
     private final ParallelismRecord pResultRecord;
+    private final ArrayList<ArrayList<AccessTime>> accessTimeMatrix;
+    private final ArrayList<Cache> caches;
 
     private boolean printingParallelism = true;
     private boolean formatted = false;
@@ -53,7 +56,7 @@ public class HtmlFormatter {
                         padding: 8px 10px;
                     }
 
-                    td:last-of-type {
+                    .centre {
                         text-align: center;
                     }
 
@@ -158,7 +161,7 @@ public class HtmlFormatter {
             </html>
             """;
 
-    public HtmlFormatter(String heading, List<PciDevice> pciDevices, List<USBDevice> usbDevices, double cpuLoad, List<Core> cores, Ram ram, ParallelismRecord parallelismRecord) {
+    public HtmlFormatter(String heading, List<PciDevice> pciDevices, List<USBDevice> usbDevices, double cpuLoad, List<Core> cores, Ram ram, ParallelismRecord parallelismRecord, ArrayList<ArrayList<AccessTime>> accessTimeMatrix, ArrayList<Cache> caches) {
         this.heading = heading;
         this.pciDevices = pciDevices;
         this.usbDevices = usbDevices;
@@ -166,6 +169,8 @@ public class HtmlFormatter {
         this.cores = cores;
         this.ram = ram;
         this.pResultRecord = parallelismRecord;
+        this.accessTimeMatrix = accessTimeMatrix;
+        this.caches = caches;
     }
 
     // This is to access the document
@@ -205,6 +210,7 @@ public class HtmlFormatter {
 
         // Step 2: CPU Information
         body += "        <h2>CPU Information</h2>";
+        body += String.format("        <p>Model: <b>%s</b>,    cores: <b>%d</b></p>", CpuInfo.getModel(), CpuInfo.getCount());
         body += coresTable(this.cores, this.cpuLoad);
         body += "            <h3>Load and Parallelism</h3>\n";
         body += loadAndParallelismTable();
@@ -255,6 +261,8 @@ public class HtmlFormatter {
                 ram.freePercentage()*100,
                 ram.totalPercentage()*100
             );
+        body += memoryHierarchyTable();
+        body += cacheTable();
 
         // Step 4: PCI Device Information
         body += "        <h2>PCI Device Information</h2>\n";
@@ -307,7 +315,7 @@ public class HtmlFormatter {
             body += String.format("""
                                     <tr>
                                         <td>%d</td>
-                                        <td>%.2f%%</td>
+                                        <td class="centre">%.2f%%</td>
                                     <tr>
                     """, c.core(), c.load());
         }
@@ -318,7 +326,7 @@ public class HtmlFormatter {
                             <tfoot>
                                 <tr>
                                     <th scope="row" colspan="1">Total load</th>
-                                    <td>%.2f%%</td>
+                                    <td class="centre">%.2f%%</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -326,8 +334,14 @@ public class HtmlFormatter {
         return body;
     }
 
+    @SuppressWarnings("null")
     private String busDeviceTable(List<? extends BusDevice> devices) {
-        String busType = devices.get(0).busType().toLowerCase();
+        BusType busType;
+        if (devices.size() > 0) {
+            busType = devices.get(0).busType();
+        } else {
+            busType = BusType.UNKNOWN;
+        }
         String table = "";
 
         // New table declaration
@@ -344,20 +358,20 @@ public class HtmlFormatter {
                                     <th scope="col", onclick="sortTable(1, '%s', false)", class="clickable">
                                         Device
                                     </th>
-                """, busType, (busType == "pci") ? "PCI" : "USB", busType, busType);
+                """, busType, busType, busType, busType);
         
         // PCI devices have extra fields that can be filled, so for them we add 2 extra columns
-        if (busType == "pci") {
+        if (busType == BusType.PCI) {
             table += """
-                                        <th scope="col", onclick="sortTable(2, 'pci', false)", class="clickable">
+                                        <th scope="col", onclick="sortTable(2, 'PCI', false)", class="clickable">
                                             Function
                                         </th>
-                                        <th scope="col", onclick="sortTable(3, 'pci', true)", class="clickable">
+                                        <th scope="col", onclick="sortTable(3, 'PCI', true)", class="clickable">
                                             Address
                                         </th>
                     """;
         }
-        int sub = (busType == "pci") ? 0 : 2;
+        int sub = (busType == BusType.PCI) ? 0 : 2;
         table += String.format("""
                                     <th scope="col", onclick="sortTable(%d, '%s', false)", class="clickable">
                                         ID
@@ -381,7 +395,7 @@ public class HtmlFormatter {
                 4 - sub, busType,
                 5 - sub, busType,
                 6 - sub, busType,
-                (busType == "pci") ? "Class" : "Device Type" ,
+                (busType == BusType.PCI) ? "Class" : "Device Type" ,
                 7 - sub, busType,
                 8 - sub, busType);
 
@@ -396,7 +410,7 @@ public class HtmlFormatter {
                                         %d
                                     </td>
                     """, d.getBus(), d.getDevice());
-            if (busType == "pci") {
+            if (busType == BusType.PCI) {
                 table += String.format("""
                                         <td>
                                             %d
@@ -483,6 +497,124 @@ public class HtmlFormatter {
                     pResultRecord.timeTaken().get(load).doubleValue(), 
                     pResultRecord.speedup().get(load).doubleValue(), 
                     pResultRecord.amdahlSpeedups().get(load).doubleValue());
+            table += "            </tr>\n";
+        }
+        table += """
+                            </tbody>
+                        </table>
+                """;
+        return table;
+    }
+
+    private String memoryHierarchyTable() {
+        String table = "";
+        //  All of this is just the headers and caption for the table
+        table += """
+                <table>
+                    <caption>
+                        Memory Hierarchy Exploration — Working Set Table
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th>
+                                Set Size (KiB)
+                            </th>
+                            <th>
+                                Stride 1 (ns)
+                            </th>
+                            <th>
+                                Stride 2 (ns)
+                            </th>
+                            <th>
+                                Stride 4 (ns)
+                            </th>
+                            <th>
+                                Stride 8 (ns)
+                            </th>
+                            <th>
+                                Stride 16 (ns)
+                            </th>
+                            <th>
+                                Stride 32 (ns)
+                            </th>
+                            <th>
+                                Stride 64 (ns)
+                            </th>
+                            <th>
+                                Stride 128 (ns)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                """;
+        
+        // This loop is for the rows of the table
+        for (ArrayList<AccessTime> accessTimes : accessTimeMatrix) {
+            table += "            <tr>\n";
+            table += String.format("""
+                            <th scope="row"">
+                                %d
+                            </th>
+                    """, accessTimes.get(0).setSize());
+            // This is for each column
+            for (AccessTime t : accessTimes) {
+                table += String.format("""
+                                        <td>
+                                            %.2f
+                                        </td>
+                        """, t.time());
+            }
+            table += "            </tr>\n";
+        }
+        table += """
+                            </tbody>
+                        </table>
+                """;
+        return table;
+    }
+
+    private String cacheTable() {
+        String table = "";
+        table += """
+                <table>
+                    <caption>
+                        Caches present on this machine
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">
+                                Cache Level
+                            </th>
+                            <th scope="col">
+                                Cache Type
+                            </th>
+                            <th scope="col">
+                                Cache Size
+                            </th>
+                            <th scope="col">
+                                Line Size
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                """;
+        for (Cache c : caches) {
+
+            table += "            <tr>\n";
+            table += String.format("""
+                                    <td>
+                                        L%s
+                                    </td>
+                                    <td>
+                                        %s
+                                    </td>
+                                    <td>
+                                        %s
+                                    </td>
+                                    <td>
+                                        %s Bytes
+                                    </td>
+                    """, c.level(), c.type(), c.size(), c.lineSize());
             table += "            </tr>\n";
         }
         table += """

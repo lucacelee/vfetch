@@ -91,15 +91,6 @@ public class vfetch {
         //I kept the print statement for this one in the PciDevices class file because it was 
         //so much easier because all the variables were local to that class
 
-        // idLookup pci = idLookup.pci();
-        // println("PCI devices: " + pciInfo.getCount());
-        // for (int i = 0; i < pciInfo.getCount(); i++) {
-        //     int vendor = pciInfo.getVendorId(i);
-        //     int device = pciInfo.getDeviceId(i);
-        //     printf("  %s  %04x:%04x  %s %s%n", pciInfo.getAddress(i), vendor, device,
-        //                       pci.vendorName(vendor), pci.deviceName(vendor, device));
-        // }
-
         //Requirement 4: USB devices
         printf("USB DEVICES LIST (Total: %d devices)%n", usbInfo.getCount());
         ArrayList<USBDevice> usbDevices = USBDevice.mapDevices();
@@ -138,10 +129,10 @@ public class vfetch {
         }
 
         println("\n--- Sampling Core Load using Trial.java ---");
-        Trial liveTrial = new Trial(1000); // Sample over 1000ms
+        Trial liveTrial = Parallelism.trial();
         ArrayList<Core> coreLoads = new ArrayList<Core>();
-        for (int i = 0; i < coresAvailable; i++) {
-            printf("  Core %d Load: %.2f%%%n", i, liveTrial.getCoreLoad(i));
+        for (int i = 0; i < CpuInfo.getCount(); i++) {
+            vfetch.printf("  Core %d Load: %.2f%%%n", i, liveTrial.getCoreLoad(i));
             coreLoads.add(new Core(i, liveTrial.getCoreLoad(i)));
         }
         printf("  Average Load across all cores: %.2f%%%n", liveTrial.getCpuLoad());
@@ -164,7 +155,9 @@ public class vfetch {
                 trial.getCpuLoad(),
                 cores,
                 new Ram(memInfo.getTotal(), memInfo.getUsed(), memInfo.getAvailable()),
-                parrallelismTest
+                parrallelismTest,
+                MemHierarchy.getAccessTimeMatrix(),
+                MemHierarchy.getCaches()
             );
             formatter.formatHTML();
             DocumentWriter.write(fileName, formatter.htmlDocument());

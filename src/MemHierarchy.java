@@ -2,9 +2,12 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class MemHierarchy {
+    private static ArrayList<ArrayList<AccessTime>> accessTimeMatrix = new ArrayList<ArrayList<AccessTime>>();
+    private static ArrayList<Cache> caches = new ArrayList<Cache>();
 
     public static void caching() throws IOException {
         vfetch.println("----------------------------------Working set table----------------------------------");
@@ -32,7 +35,7 @@ public class MemHierarchy {
                 vfetch.print((workingSet * 4) /1024 + "          ");
             }
            //Prints the working set sizes in Kib (else if is for formatting the table)
-            
+            ArrayList<AccessTime> accessTimes = new ArrayList<>();
             for (int stride = 1; stride <= 256; stride *= 2){
                  //strides choose how many integers are skipped during the adding process
                  // 1 Stride is equal to 4 bytes as we are moving in ints
@@ -68,10 +71,12 @@ public class MemHierarchy {
                 vfetch.printf("%.2f  ns    ", timePerAccess);
                 }
                 // again just formatting the table if averages are over 10ns
+                accessTimes.add(new AccessTime(stride, workingSet, timePerAccess));
             }
             
             vfetch.println();
             
+            accessTimeMatrix.add(accessTimes);
         }
         vfetch.println();
         vfetch.println("final sum:" + sum); //small check to make sure sum is used and the compiler is happy
@@ -85,9 +90,18 @@ public class MemHierarchy {
             String lineSize = Files.readString(cacheDir.resolve("coherency_line_size")).trim();
 
             vfetch.printf("L%s Cache (%s)%n" + "  Cache size      : %s%n" + "  Line Size : %s bytes%n%n", level, type, size, lineSize);
+            caches.add(new Cache(level, type, size, lineSize));
             }  else {
                 vfetch.println("Unable to read cache info for index" + i);
             }
         } // This returns values for caches L1, L2 and L3 reading sizes and line sizes for comparison sake with the table
+    }
+
+    public static ArrayList<ArrayList<AccessTime>> getAccessTimeMatrix() {
+        return accessTimeMatrix;
+    }
+
+    public static ArrayList<Cache> getCaches() {
+        return caches;
     }
 }
