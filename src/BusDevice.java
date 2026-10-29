@@ -1,4 +1,7 @@
 public abstract class BusDevice {
+    //an abstract base class for all bus devices, which will be extended by PciDevice and UsbDevice.
+    // It contains the common attributes and getters for all bus devices. It just prevents duplication
+    // of code between pcidevice and usbdevice. 
     
     // Declare attributes
 

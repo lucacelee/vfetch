@@ -79,7 +79,7 @@ public class Parallelism{
 
     //creating a method that calculates f; the fraction of the workload that is serial, 
     //based on the baseline time and the time it takes to run the workload with n threads.
-    //f = (baselineTime - parallelTime) / baselineTime;
+    //Manipulating formula for speedup = 1 / (f + (1-f)/n) gives us f = (n - speedup) / ((n-1)*speedup)
 
     public static double calculateF(double baselineTime, double parallelTime, int numThreads) {
         double speedup = baselineTime / parallelTime;
