@@ -29,7 +29,7 @@ public class HtmlFormatter {
         methods.
     */
 
-    private String html = """
+    private final String html = """
             <!DOCTYPE html>
             <html>
                 <style>
@@ -164,6 +164,8 @@ public class HtmlFormatter {
             </html>
             """;
 
+    private String output;
+
     public HtmlFormatter(String heading, List<PciDevice> pciDevices, List<USBDevice> usbDevices, double cpuLoad, List<Core> cores, Ram ram, ParallelismRecord parallelismRecord, ArrayList<ArrayList<AccessTime>> accessTimeMatrix, ArrayList<Cache> caches) {
         this.heading = heading;
         this.pciDevices = pciDevices;
@@ -189,12 +191,11 @@ public class HtmlFormatter {
     // This is to access the document
     public String htmlDocument() {
         if (!formatted) return "";
-        return html;
+        return output;
     }
 
     // This is to format the document
     public void formatHTML() {
-        html = html.replaceAll("!title;", heading);
         String body = "";
 
         // Populating the HTML with data
@@ -305,12 +306,12 @@ public class HtmlFormatter {
         body += busDeviceTable(usbDevices);
 
         // Step 6: Fill in the data into the template
-        html = html.replaceAll("!body;", body);
+        output = html.replaceAll("!body;", body).replaceAll("!title;", heading);
 
         if (dynamicPage) {
-            html = html.replaceAll("!refreshtag;", "<meta http-equiv=\"refresh\" content=\"2\">");
+            output = output.replaceAll("!refreshtag;", "<meta http-equiv=\"refresh\" content=\"2\">");
         } else {
-            html = html.replaceAll("!refreshtag;", "");
+            output = output.replaceAll("!refreshtag;", "");
         }
         formatted = true;
     }
