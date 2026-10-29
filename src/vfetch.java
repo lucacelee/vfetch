@@ -30,9 +30,13 @@ public class vfetch {
         
         //Requirement 1: Processor
 
+        println("------CPU INFORMATION------");
         println();
-        println("model:  " + CpuInfo.getModel());
-        println("cores:  " + CpuInfo.getCount());
+        println("Model:             " + CpuInfo.getModel());
+        println("Cores:             " + CpuInfo.getCount());
+        println("Physical Cores:    " + CpuInfo.getPhysicalCoreCount());
+        println("Virtual Cores:     " + CpuInfo.getCount());
+        println("Hyperthreading:    " + ((CpuInfo.getPhysicalCoreCount() == CpuInfo.getCount()) ? "DISABLED" : "ENABLED"));
         println();
 
         Trial trial = new Trial(1000);
