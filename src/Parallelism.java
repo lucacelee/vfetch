@@ -1,6 +1,12 @@
 import java.util.Random;
 
 public class Parallelism{
+    private static Trial trial;
+
+    static private void startTrial(int millis) {
+        // Run the Trial while the threads are executing, as opposed to after
+        trial = new Trial(millis);
+    }
 
     /*This is the CPU heavy workload we agreed on, it has
     two matrices that store longs, multiplies index[x][y] in
@@ -41,6 +47,8 @@ public class Parallelism{
         int rowsPerThread = matrixSize / numThreads;
 
         long startTime = System.nanoTime();
+        Thread benchmarkThread = new Thread(() -> startTrial(500)); // Sample over 500ms
+        benchmarkThread.start();
 
         for(int i = 0; i < numThreads; i++){
             int startRow = i * rowsPerThread;
@@ -50,12 +58,19 @@ public class Parallelism{
             threads[i].start();
         }
 
+
         for(int i = 0; i < numThreads; i++){
             try{
                 threads[i].join(); //this waits for each thread to finish before moving on to the next one.
             } catch (InterruptedException e){
                 e.printStackTrace();
             }
+        }
+
+        try {
+            benchmarkThread.join();
+        } catch (InterruptedException e){
+            e.printStackTrace();
         }
 
         long endTime = System.nanoTime();
@@ -76,4 +91,7 @@ public class Parallelism{
         return (double) n / (1 + ((n - 1) * f));
     }
 
+    public static Trial trial() {
+        return trial;
+    }
 }

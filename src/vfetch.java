@@ -138,10 +138,10 @@ public class vfetch {
         }
 
         println("\n--- Sampling Core Load using Trial.java ---");
-        Trial liveTrial = new Trial(1000); // Sample over 1000ms
+        Trial liveTrial = Parallelism.trial();
         ArrayList<Core> coreLoads = new ArrayList<Core>();
-        for (int i = 0; i < coresAvailable; i++) {
-            printf("  Core %d Load: %.2f%%%n", i, liveTrial.getCoreLoad(i));
+        for (int i = 0; i < CpuInfo.getCount(); i++) {
+            vfetch.printf("  Core %d Load: %.2f%%%n", i, liveTrial.getCoreLoad(i));
             coreLoads.add(new Core(i, liveTrial.getCoreLoad(i)));
         }
         printf("  Average Load across all cores: %.2f%%%n", liveTrial.getCpuLoad());
