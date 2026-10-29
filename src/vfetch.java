@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,7 @@ public class vfetch {
     private static boolean printToConsole = true;
     private static boolean printHelpMessage = false;
     private static boolean excludeCpuHeavyTests = false;
+    private static boolean serveHtml = false;
 
     private static String fileName = "Hardware Details.html";
     public static void main(String[] args) throws Exception {
@@ -42,12 +44,7 @@ public class vfetch {
         Trial trial = new Trial(1000);
         printf("The average load across all cores is %.2f%%%n", trial.getCpuLoad());
 
-        List<Core> cores = new ArrayList<Core>();       // This unifies the code between the CLI and HTML formatter
-        for(int i = 0; i < CpuInfo.getCount(); i++){
-            Core c = new Core(i, trial.getCoreLoad(i));
-            println(c.toString());
-            cores.add(c);
-        }
+        List<Core> cores = createCoreList(trial);
 
         //Requirement 2: Memory
         
@@ -155,21 +152,90 @@ public class vfetch {
             );
         }
 
+        if (!writeToFile && !serveHtml) return;
+
+        HtmlFormatter formatter = new HtmlFormatter(
+            "System Information Breakdown",
+            pciDevices,
+            usbDevices,
+            trial.getCpuLoad(),
+            cores,
+            new Ram(memInfo.getTotal(), memInfo.getUsed(), memInfo.getAvailable()),
+            parrallelismTest,
+            MemHierarchy.getAccessTimeMatrix(),
+            MemHierarchy.getCaches()
+        );
+        
         if (writeToFile) {
-            HtmlFormatter formatter = new HtmlFormatter(
-                "System Information Breakdown",
-                pciDevices,
-                usbDevices,
-                trial.getCpuLoad(),
-                cores,
-                new Ram(memInfo.getTotal(), memInfo.getUsed(), memInfo.getAvailable()),
-                parrallelismTest,
-                MemHierarchy.getAccessTimeMatrix(),
-                MemHierarchy.getCaches()
-            );
             formatter.formatHTML();
             DocumentWriter.write(fileName, formatter.htmlDocument());
         }
+
+        if (serveHtml) {
+            WebServer server = new WebServer(8080);
+            Thread repeatFormattingThread = new Thread(() -> {
+                while (true) {
+                    printToConsole = false;
+                    Trial dynamicTrial = new Trial(1000);
+                    List<Core> dynamicCores = createCoreList(dynamicTrial);
+                    List<PciDevice> dynamicPciDevices;
+
+                    try {
+                        dynamicPciDevices = PciDevice.mapDevices();
+                    } catch (IOException e) {
+                        dynamicPciDevices = pciDevices;
+                        System.err.println("Failed to fetch new PCI devices!");
+                        e.printStackTrace();
+                    }
+
+                    ArrayList<USBDevice> dynamicUsbDevices;
+
+                    try {
+                        dynamicUsbDevices = USBDevice.mapDevices();
+                    } catch (IOException e) {
+                        dynamicUsbDevices = usbDevices;
+                        System.err.println("Failed to fetch new USB devices!");
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        formatter.updateStaticData(
+                            dynamicPciDevices,
+                            dynamicUsbDevices, 
+                            dynamicTrial.getCpuLoad(), 
+                            dynamicCores, 
+                            new Ram(memInfo.getTotal(), memInfo.getUsed(), memInfo.getAvailable())
+                        );
+                    } catch (Exception e) {
+                        System.err.println("Failed to update the formatter!");
+                        e.printStackTrace();
+                    }
+                    formatter.setDynamic();
+                    formatter.formatHTML();
+                    server.setResponse(formatter.htmlDocument());
+                    try {
+                        Thread.sleep(900);
+                    } catch (InterruptedException e) {
+                        println(e.getMessage());
+                    }
+                }
+            });
+
+            repeatFormattingThread.start();
+
+            server.create();
+            server.start();
+        }
+    }
+
+    private static List<Core> createCoreList(Trial trial) {
+        List<Core> cores = new ArrayList<Core>();       // This unifies the code between the CLI and HTML formatter
+        for(int i = 0; i < CpuInfo.getCount(); i++){
+            Core c = new Core(i, trial.getCoreLoad(i));
+            println(c.toString());
+            cores.add(c);
+        }
+        return cores;
     }
 
     private static void processArguments(String[] args) {
@@ -194,9 +260,13 @@ public class vfetch {
                                 previousCommand = "help";
                                 break;
                             case 'e':
-                            excludeCpuHeavyTests = true;
-                            previousCommand = "exclude-cpu-tests";
-                            break;
+                                excludeCpuHeavyTests = true;
+                                previousCommand = "exclude-cpu-tests";
+                                break;
+                            case 'l':
+                                serveHtml = true;
+                                previousCommand = "live-updates";
+                                break;
                         }
                     }
                 } else {
@@ -217,6 +287,10 @@ public class vfetch {
                         case "exclude-cpu-tests":
                             excludeCpuHeavyTests = true;
                             previousCommand = "exclude-cpu-tests";
+                            break;
+                        case "live-updates":
+                            serveHtml = true;
+                            previousCommand = "live-updates";
                             break;
                     }
                 }
@@ -240,6 +314,8 @@ public class vfetch {
                                                 By default it's "Hardware Details.html".
                         -e --exclude-cpu-tests  Run the program without conducting
                                                 CPU-heavy tests
+                        -l --live-updates       Starts a HTTP server, which serves live
+                                                system updates through the HTML page
                 """);
     }
 
