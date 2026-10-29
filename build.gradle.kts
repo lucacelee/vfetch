@@ -5,6 +5,10 @@
  * For more details on building Java & JVM projects, please refer to https://docs.gradle.org/9.8.2/userguide/building_java_projects.html in the Gradle documentation.
  */
 
+ //Gradle is a build automation tool - it automates repetitive tasks like compiling src code and installing dependencies.
+ //It removes the need to run command lines "javac -d out src/*.java" and "java -cp out vfetch"
+ //Gradle replaces those manual terminal steps with repeatable task commands like "./gradlew build"" or ""./gradlew run"
+
 sourceSets {
     main {
         java {
@@ -15,16 +19,17 @@ sourceSets {
 
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
+    //tells gradle that this project is a runnable command-line application
     application
 }
 
 repositories {
-    // Use Maven Central for resolving dependencies.
+    // Use Maven Central for resolving dependencies. Tells Gradle where to look on the internet to find dependencies.
     mavenCentral()
 }
 
 dependencies {
-    // Use JUnit Jupiter for testing.
+    // Use JUnit Jupiter for unit testing.
     testImplementation(libs.junit.jupiter)
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -34,6 +39,7 @@ dependencies {
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
+//specifies that the project requires java 21 to compile and run
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
