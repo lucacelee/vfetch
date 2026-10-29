@@ -212,7 +212,22 @@ public class HtmlFormatter {
 
         // Step 2: CPU Information
         body += "        <h2>CPU Information</h2>";
-        body += String.format("        <p>Model: <b>%s</b>,    cores: <b>%d</b></p>", CpuInfo.getModel(), CpuInfo.getCount());
+        body += String.format("""
+                        <ul>
+                            <li>
+                                Model: <b>%s</b>
+                            </li>
+                            <li>
+                                Virtual Cores: <b>%d</b>
+                            </li>
+                            <li>
+                                Physical Cores: <b>%d</b>
+                            </li>
+                            <li>
+                                Hyperthreading: <i>%s</i>
+                            </li>
+                        </ul>
+                """, CpuInfo.getModel(), CpuInfo.getCount(), CpuInfo.getPhysicalCoreCount(), ((CpuInfo.getCount() == CpuInfo.getPhysicalCoreCount()) ? "DISABLED" : "ENABLED"));
         body += coresTable(this.cores, this.cpuLoad);
         if (printingParallelism) {
             body += "            <h3>Load and Parallelism</h3>\n";
