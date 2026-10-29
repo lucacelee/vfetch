@@ -17,6 +17,7 @@ public class vfetch {
     private static boolean printToConsole = true;
     private static boolean printHelpMessage = false;
     private static boolean excludeCpuHeavyTests = false;
+    private static boolean excludeMemoryHierarchyTests = false;
     private static boolean serveHtml = false;
 
     private static String fileName = "Hardware Details.html";
@@ -58,7 +59,9 @@ public class vfetch {
         }
         memInfo.displayPercentage();
         println();
-        MemHierarchy.caching();
+
+        if (!excludeMemoryHierarchyTests)
+            MemHierarchy.caching();
 
         //Requirement 3 + 6: Pci devices and analysis
 
@@ -162,8 +165,8 @@ public class vfetch {
             cores,
             new Ram(memInfo.getTotal(), memInfo.getUsed(), memInfo.getAvailable()),
             parrallelismTest,
-            MemHierarchy.getAccessTimeMatrix(),
-            MemHierarchy.getCaches()
+            (excludeMemoryHierarchyTests) ? null : MemHierarchy.getAccessTimeMatrix(),
+            (excludeMemoryHierarchyTests) ? null : MemHierarchy.getCaches()
         );
         
         if (writeToFile) {
@@ -263,6 +266,10 @@ public class vfetch {
                                 excludeCpuHeavyTests = true;
                                 previousCommand = "exclude-cpu-tests";
                                 break;
+                            case 'd':
+                                excludeMemoryHierarchyTests = true;
+                                previousCommand = "disable-mem-test";
+                                break;
                             case 'l':
                                 serveHtml = true;
                                 previousCommand = "live-updates";
@@ -288,6 +295,10 @@ public class vfetch {
                             excludeCpuHeavyTests = true;
                             previousCommand = "exclude-cpu-tests";
                             break;
+                        case "disable-mem-test":
+                            excludeMemoryHierarchyTests = true;
+                            previousCommand = "disable-mem-test";
+                            break;
                         case "live-updates":
                             serveHtml = true;
                             previousCommand = "live-updates";
@@ -308,12 +319,19 @@ public class vfetch {
                 Usage: vfetch [options] [output_file_name]
                     options:
                         -h --help               Print this message
+
                         -s --silent             Execute without printing anything
+
                         -o --output             Create a HTML document, where
                                                 [output_file_name] is its name.
                                                 By default it's "Hardware Details.html".
+
                         -e --exclude-cpu-tests  Run the program without conducting
                                                 CPU-heavy tests
+
+                        -d --disable-mem-test   Disables the memory hierarchy and cache
+                                                exploration tests
+
                         -l --live-updates       Starts a HTTP server, which serves live
                                                 system updates through the HTML page
                 """);
