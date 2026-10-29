@@ -543,6 +543,9 @@ public class HtmlFormatter {
                             <th>
                                 Stride 128 (ns)
                             </th>
+                            <th>
+                                Stride 256 (ns)
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
