@@ -64,20 +64,20 @@ The repository includes a Gradle Wrapper (`gradlew`), ensuring the application i
 
 ## Where the information comes from
 
-**Processor Model & Core Count** | `CpuInfo.java` |
-**CPU Busy & Idle Ticks** | `CpuInfo.java`, `Trial.java` |
-**Core Load Representation** | `Core.java` |
-**Memory (RAM) Usage** | `memInfo.java`, `Ram.java` |
-**CPU Cache Hierarchy Info** | `MemHierarchy.java`, `Cache.java` |
-**Memory Latency Benchmark** | `MemHierarchy.java`, `AccessTime.java`|
-**PCI Devices** | `pciInfo.java`, `PciDevice.java` |
-**USB Devices** | `usbInfo.java`, `USBDevice.java` |
-**Device & Class Name Lookup** | `idLookup.java` |
-**Shared Hardware Device Base** | `BusDevice.java`, `BusType.java` |
-**Multi-Core Parallelism Benchmark** | `Parallelism.java`, `ParallelismRecord.java` |
-**HTML Report Formatting** | `HtmlFormatter.java` |
-**HTML File Output** | `DocumentWriter.java` |
-**CLI Execution & Coordination** | `vfetch.java` |
+- **Processor Model & Core Count** | `CpuInfo.java` |
+- **CPU Busy & Idle Ticks** | `CpuInfo.java`, `Trial.java` |
+- **Core Load Representation** | `Core.java` |
+- **Memory (RAM) Usage** | `memInfo.java`, `Ram.java` |
+- **CPU Cache Hierarchy Info** | `MemHierarchy.java`, `Cache.java` |
+- **Memory Latency Benchmark** | `MemHierarchy.java`, `AccessTime.java`|
+- **PCI Devices** | `pciInfo.java`, `PciDevice.java` |
+- **USB Devices** | `usbInfo.java`, `USBDevice.java` |
+- **Device & Class Name Lookup** | `idLookup.java` |
+- **Shared Hardware Device Base** | `BusDevice.java`, `BusType.java` |
+- **Multi-Core Parallelism Benchmark** | `Parallelism.java`, `ParallelismRecord.java` |
+- **HTML Report Formatting** | `HtmlFormatter.java` |
+- **HTML File Output** | `DocumentWriter.java` |
+- **CLI Execution & Coordination** | `vfetch.java` |
 
 For data that keeps changing ad can be kept track of, the program allows you to view the HTML document on a web-page. Pass `-l` / `--live-updates` to launch a http server after conducting tests.
 ## Data sources
