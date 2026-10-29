@@ -363,10 +363,10 @@ public class HtmlFormatter {
         // PCI devices have extra fields that can be filled, so for them we add 2 extra columns
         if (busType == BusType.PCI) {
             table += """
-                                        <th scope="col", onclick="sortTable(2, 'pci', false)", class="clickable">
+                                        <th scope="col", onclick="sortTable(2, 'PCI', false)", class="clickable">
                                             Function
                                         </th>
-                                        <th scope="col", onclick="sortTable(3, 'pci', true)", class="clickable">
+                                        <th scope="col", onclick="sortTable(3, 'PCI', true)", class="clickable">
                                             Address
                                         </th>
                     """;
