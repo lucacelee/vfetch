@@ -2,9 +2,12 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class MemHierarchy {
+    private static ArrayList<ArrayList<AccessTime>> accessTimeMatrix = new ArrayList<ArrayList<AccessTime>>();
+    private static ArrayList<Cache> caches = new ArrayList<Cache>();
 
     public static void caching() throws IOException {
         vfetch.println("----------------------------------Working set table----------------------------------");
@@ -32,11 +35,12 @@ public class MemHierarchy {
             }
            //Prints the working set sizes in Kib (else if is for formatting the table)
 
+            ArrayList<AccessTime> accessTimes = new ArrayList<>();
             for (int stride = 1; stride <= 128; stride *= 2){
                  //strides choose how many integers are skipped during the adding process
                 long accesses = 0;
                 long startTime = System.nanoTime();
-
+                
                 for (int trial = 0; trial < trialSize; trial++) {
                     for (int i = 0; i < workingSet; i+= stride) {
                         accesses++;
@@ -50,6 +54,7 @@ public class MemHierarchy {
                 } else {
                 vfetch.printf("%.2f  ns    ", timePerAccess);
                 }
+                accessTimes.add(new AccessTime(stride, workingSet, timePerAccess));
             }
             if (trialSize > 50){
                  trialSize = Math.max(50, trialSize/2);
@@ -57,6 +62,7 @@ public class MemHierarchy {
                 //otherwise this would lead to later working sets having almost a billion accesses
             }
             vfetch.println();
+            accessTimeMatrix.add(accessTimes);
         }
         vfetch.println();
         for (int i = 0; i < 4; i++) {
@@ -68,9 +74,18 @@ public class MemHierarchy {
             String lineSize = Files.readString(cacheDir.resolve("coherency_line_size")).trim();
 
             vfetch.printf("L%s Cache (%s)%n" + "  Cache size      : %s%n" + "  Line Size : %s bytes%n%n", level, type, size, lineSize);
+            caches.add(new Cache(level, type, size, lineSize));
             }  else {
                 vfetch.println("Unable to read cache info for index" + i);
             }
         } // This returns values for caches L1, L2 and L3 reading sizes and line sizes for comparison sake with the table
+    }
+
+    public static ArrayList<ArrayList<AccessTime>> getAccessTimeMatrix() {
+        return accessTimeMatrix;
+    }
+
+    public static ArrayList<Cache> getCaches() {
+        return caches;
     }
 }
