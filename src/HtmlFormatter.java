@@ -12,6 +12,8 @@ public class HtmlFormatter {
     private final ArrayList<ArrayList<AccessTime>> accessTimeMatrix;
     private final ArrayList<Cache> caches;
 
+    private boolean dynamicPage = false;
+
     private boolean printingParallelism = true;
     private boolean formatted = false;
 
@@ -82,6 +84,7 @@ public class HtmlFormatter {
                 </style>
                 <head>
                     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+                    !refreshtag;
                     <title>!title;</title>
                 </head>
                 <body>
@@ -173,6 +176,14 @@ public class HtmlFormatter {
         this.caches = caches;
 
         if (parallelismRecord == null) this.printingParallelism = false;
+    }
+
+    public void setDynamic() {
+        this.dynamicPage = true;
+    }
+
+    public void setStatic() {
+        this.dynamicPage = false;
     }
 
     // This is to access the document
@@ -295,6 +306,12 @@ public class HtmlFormatter {
 
         // Step 6: Fill in the data into the template
         html = html.replaceAll("!body;", body);
+
+        if (dynamicPage) {
+            html = html.replaceAll("!refreshtag;", "<meta http-equiv=\"refresh\" content=\"2\">");
+        } else {
+            html = html.replaceAll("!refreshtag;", "");
+        }
         formatted = true;
     }
 
