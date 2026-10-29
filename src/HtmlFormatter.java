@@ -3,14 +3,16 @@ import java.util.List;
 
 public class HtmlFormatter {
     private final String heading;
-    private final List<PciDevice> pciDevices;
-    private final List<USBDevice> usbDevices;
-    private final List<Core> cores;
-    private final double cpuLoad;
-    private final Ram ram;
+    private List<PciDevice> pciDevices;
+    private List<USBDevice> usbDevices;
+    private List<Core> cores;
+    private double cpuLoad;
+    private Ram ram;
     private final ParallelismRecord pResultRecord;
     private final ArrayList<ArrayList<AccessTime>> accessTimeMatrix;
     private final ArrayList<Cache> caches;
+
+    private boolean dynamicPage = false;
 
     private boolean printingParallelism = true;
     private boolean formatted = false;
@@ -27,7 +29,7 @@ public class HtmlFormatter {
         methods.
     */
 
-    private String html = """
+    private final String html = """
             <!DOCTYPE html>
             <html>
                 <style>
@@ -82,6 +84,7 @@ public class HtmlFormatter {
                 </style>
                 <head>
                     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+                    !refreshtag;
                     <title>!title;</title>
                 </head>
                 <body>
@@ -161,6 +164,8 @@ public class HtmlFormatter {
             </html>
             """;
 
+    private String output;
+
     public HtmlFormatter(String heading, List<PciDevice> pciDevices, List<USBDevice> usbDevices, double cpuLoad, List<Core> cores, Ram ram, ParallelismRecord parallelismRecord, ArrayList<ArrayList<AccessTime>> accessTimeMatrix, ArrayList<Cache> caches) {
         this.heading = heading;
         this.pciDevices = pciDevices;
@@ -175,15 +180,30 @@ public class HtmlFormatter {
         if (parallelismRecord == null) this.printingParallelism = false;
     }
 
+    public void updateStaticData(List<PciDevice> pciDevices, List<USBDevice> usbDevices, double cpuLoad, List<Core> cores, Ram ram) {
+        this.pciDevices = pciDevices;
+        this.usbDevices = usbDevices;
+        this.cpuLoad = cpuLoad;
+        this.cores = cores;
+        this.ram = ram;
+    }
+
+    public void setDynamic() {
+        this.dynamicPage = true;
+    }
+
+    public void setStatic() {
+        this.dynamicPage = false;
+    }
+
     // This is to access the document
     public String htmlDocument() {
         if (!formatted) return "";
-        return html;
+        return output;
     }
 
     // This is to format the document
     public void formatHTML() {
-        html = html.replaceAll("!title;", heading);
         String body = "";
 
         // Populating the HTML with data
@@ -294,7 +314,13 @@ public class HtmlFormatter {
         body += busDeviceTable(usbDevices);
 
         // Step 6: Fill in the data into the template
-        html = html.replaceAll("!body;", body);
+        output = html.replaceAll("!body;", body).replaceAll("!title;", heading);
+
+        if (dynamicPage) {
+            output = output.replaceAll("!refreshtag;", "<meta http-equiv=\"refresh\" content=\"2\">");
+        } else {
+            output = output.replaceAll("!refreshtag;", "");
+        }
         formatted = true;
     }
 
